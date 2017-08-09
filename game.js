@@ -56,6 +56,7 @@ var Game = (function() {
         updateResourceEfficiencyDisplay();
         updateEnergyEfficiencyDisplay();
         updateScienceEfficiencyDisplay();
+        updateBatteryEfficiencyDisplay();
 
         legacyRefreshUI();
 
@@ -140,6 +141,7 @@ var Game = (function() {
         this.tech.save(data);
         this.settings.save(data);
         this.interstellar.save(data);
+        this.updates.save(data);
 
         data = legacySave(data);
 
@@ -159,10 +161,13 @@ var Game = (function() {
             this.resources.load(data);
             this.buildings.load(data);
             this.tech.load(data);
-            this.settings.load(data);
+            
             this.interstellar.load(data);
+            this.updates.load(data);
 
             legacyLoad(data);
+
+            this.settings.load(data);
         }
         Game.settings.updateCompanyName();
         refreshResources();
@@ -220,20 +225,24 @@ var Game = (function() {
         self.ui.updateAutoDataBindings();
 
         // Initialize first
-        self.achievements.initialize();
-        self.statistics.initialize();
-        self.resources.initialize();
-        self.buildings.initialize();
-        self.tech.initialize();
-        self.interstellar.initialize();
-        self.settings.initialize();
-
-        for(var i = 0; i < self.uiComponents.length; i++) {
-            self.uiComponents[i].initialize();
-        }
+        self.achievements.initialise();
+        self.statistics.initialise();
+        self.resources.initialise();
+        self.buildings.initialise();
+        self.tech.initialise();
+        self.interstellarBETA.initialise();
+        self.stargaze.initialise();
 
         // Now load
         self.load();
+        self.settings.initialise();
+
+        for(var i = 0; i < self.uiComponents.length; i++) {
+            self.uiComponents[i].initialise();
+        }
+
+        // Display what has changed since last time
+        self.updates.initialise();
 
         // Then start the main loops
         self.createInterval("Fast Update", self.fastUpdate, 100);
@@ -244,6 +253,7 @@ var Game = (function() {
         window.setInterval(function(){ Game.fixedUpdate(); },100);
 
         console.debug("Load Complete");
+
     };
 
     instance.loadAnimation = function(self, delta) {

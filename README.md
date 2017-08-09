@@ -13,13 +13,15 @@ Currently, the game is in Beta, which means there is frequent, active developmen
 
 v0.6.0 The Lore Update
 https://www.reddit.com/r/SpaceCompany/wiki/futureplans#wiki_v0.6
+
 - Adding Lore onto every Building and an introduction to your Space Company
-- Rebalance all costs to not use as much Space Metal/Gems
+- Rebalance all costs to not use as much Lunarite/Gems
 - Loading screen flavour text changes as you progress
-- Change Space Metal to a proper name
+- Change Lunarite to a proper name
 
 v0.5.0 The Interstellar Update
 https://www.reddit.com/r/SpaceCompany/wiki/futureplans#wiki_v0.5
+
 - Dark Matter
 - Prestige (https://www.reddit.com/r/SpaceCompany/comments/6lcgzu/plan_for_prestige/)
 - Unknown Planets that you have to explore to know what it holds
@@ -34,16 +36,18 @@ https://www.reddit.com/r/SpaceCompany/wiki/futureplans#wiki_v0.5
 - Achievements with Bonuses
 - Change Letter Formatting To Start At 100K
 - Rebalance Science
+- Change Icons (white circle with icon inside)
 
 # Changelog:
 
 ### v0.5.0
 ##### Features
+
 - Offline Production
 - Screen Notifications Graphics Option
 - Kongregate Leaderboard
 - 7 New Themes
-- Random Loading Messages (41)
+- Random Loading Messages (100)
 - Communication Wonder
 - Rocket Wonder
 - Antimatter Wonder
@@ -59,8 +63,18 @@ https://www.reddit.com/r/SpaceCompany/wiki/futureplans#wiki_v0.5
 - Tier 4 Labs
 - Tier 4 Batteries
 - Custom Company Name
+- Copy Export to Clipboard
+- Update Log On Page Load
+- Battery Efficiency Research
+- Coloured Destroy Button Option
+- Hydrazine Catalyst - T3 Rocket Fuel
+- Interstellar Radar Scanner
+- Achievement Ranks
+- Renamed Space Metal as Lunarite
+- The Wonder Tab hides itself when completed (makes space for more tabs)
 
 ##### Small Changes
+
 - Individual buttons to turn off Plasma and Meteorite Machines
 - Turn-off switch for all energy producers/consumers
 - Alternative scientific formatting
@@ -76,8 +90,20 @@ https://www.reddit.com/r/SpaceCompany/wiki/futureplans#wiki_v0.5
 - Made EMC Max By Default
 - Import Checks For Empty Field To Refuse Load
 - Fixed Typos
+- Fixed Interstellar Backwards Compatibility
+- Changed Dyson Parts Buying To Buy Parts And Build Dyson
+- Destroy Alcubierre Drive Button
+- Nerfed Energy Efficiency to be 1000x cheaper, but only go up to 25%
+- Changed Multibuy researches to show current level instead of next level
+- Buffed Battery Efficiency to 200 levels instead of 50
+- Nerfed Rocket Fuel Research Costs
+- Buffed Hydrazine Production
+- Achievement Number Formatting
+- Rocket Fuel Machine Achievements
+- Fixed Hydrazine Not Getting Resource Efficiency
 
 ##### Bug Fixes
+
 - Fixed Bug With Solar System Sidebar
 - Fixed Unlocked Tabs Statistic Bug
 - Fixed Rocket Launching Costs Not Being Red
@@ -94,11 +120,18 @@ https://www.reddit.com/r/SpaceCompany/wiki/futureplans#wiki_v0.5
 - Fixed Dyson Sections Cost Bug
 - Fixed Plasma EMC Display Bug
 - Fixed Stargate Red Costs Bug
-- Fixed T3 Battery Space Metal Cost Not Saving
+- Fixed T3 Battery Lunarite Cost Not Saving
 - Fixed UI Bug With Certain Themes
 - Fixed Rocket Building Not Saving
 - Fixed Antimatter Decimals Not Being Uniform
+- Fixed Batteries Not Unlocking Without Refresh
 - Fixed Interstellar Backwards Compatibility
+- Fixed Browser Compatibility Problem
+- Fixed Antimatter Not Turning Green On Full Storage
+- Fixed Hydrazine Research Cost Not Turning Red
+- Fixed Antimatter Going Above 100k
+- Fixed Buying Multiple Solar System Rockets
+- Fixed T4 Science unlocking only after refresh
 
 ### v0.4.4
 ##### Features
@@ -247,7 +280,7 @@ v0.1.1
 
 v0.1.0 The Space Update
 - Space travel to The Moon, Venus, Mars and the Asteroid Belt
-- New resources: Space Metal, Methane Gas, Titanium, Silver, Gold and Silicon
+- New resources: Lunarite, Methane Gas, Titanium, Silver, Gold and Silicon
 - Methane-based power
 - Commas to all numbers more than 1000
 - Fixed negative energy

@@ -6,7 +6,7 @@ Game.tech = (function(){
     instance.entries = {};
     instance.techTypeCount = 0;
 
-    instance.initialize = function() {
+    instance.initialise = function() {
         for (var id in Game.techData) {
             var data = Game.techData[id];
             this.techTypeCount++;
@@ -44,6 +44,11 @@ Game.tech = (function(){
                     }
                 }
             }
+        }
+        var tech = Game.tech.getTechData('energyEfficiencyResearch');
+        if(tech.current == tech.maxLevel){
+            var child = document.getElementById("energyEffButton");
+            child.parentNode.removeChild(child);
         }
     };
 
