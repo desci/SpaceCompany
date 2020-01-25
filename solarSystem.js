@@ -6,9 +6,7 @@ function getChemicalPlant(){
 		gem -= chemicalPlantGemCost;
 		oil -= chemicalPlantOilCost;
 		chemicalPlant += 1;
-		chemicalPlantOilCost = Math.floor(500 * Math.pow(1.1,chemicalPlant));
-		chemicalPlantGemCost = Math.floor(750 * Math.pow(1.1,chemicalPlant));
-		chemicalPlantMetalCost = Math.floor(1000 * Math.pow(1.1,chemicalPlant));
+		updateFuelProductionCost();
 	}
 }
 
@@ -18,9 +16,7 @@ function getOxidisation(){
 		gem -= oxidisationGemCost;
 		oil -= oxidisationOilCost;
 		oxidisation += 1;
-		oxidisationOilCost = Math.floor(6800 * Math.pow(1.1,oxidisation));
-		oxidisationGemCost = Math.floor(8300 * Math.pow(1.1,oxidisation));
-		oxidisationMetalCost = Math.floor(12000 * Math.pow(1.1,oxidisation));
+		updateFuelProductionCost();
 	}
 }
 
@@ -30,10 +26,22 @@ function getHydrazine(){
 		silicon -= hydrazineSiliconCost;
 		gold -= hydrazineGoldCost;
 		hydrazine += 1;
-		hydrazineGoldCost = Math.floor(78600 * Math.pow(1.1,hydrazine));
-		hydrazineSiliconCost = Math.floor(96300 * Math.pow(1.1,hydrazine));
-		hydrazineTitaniumCost = Math.floor(140000 * Math.pow(1.1,hydrazine));
+		updateFuelProductionCost();
 	}
+}
+
+function updateFuelProductionCost(){
+    chemicalPlantOilCost = Math.floor(500 * Math.pow(1.1,chemicalPlant));
+    chemicalPlantGemCost = Math.floor(750 * Math.pow(1.1,chemicalPlant));
+    chemicalPlantMetalCost = Math.floor(1000 * Math.pow(1.1,chemicalPlant));
+
+    oxidisationOilCost = Math.floor(6800 * Math.pow(1.1,oxidisation));
+    oxidisationGemCost = Math.floor(8300 * Math.pow(1.1,oxidisation));
+    oxidisationMetalCost = Math.floor(12000 * Math.pow(1.1,oxidisation));
+
+    hydrazineGoldCost = Math.floor(78600 * Math.pow(1.1,hydrazine));
+    hydrazineSiliconCost = Math.floor(96300 * Math.pow(1.1,hydrazine));
+    hydrazineTitaniumCost = Math.floor(140000 * Math.pow(1.1,hydrazine));
 }
 
 function getRocket(){
@@ -42,15 +50,15 @@ function getRocket(){
 		gem -= 900;
 		oil -= 1000;
 		rocket = 1;
-		document.getElementById("rocket").innerHTML = "Built";
+		document.getElementById("rocket").textContent = "Built";
 		document.getElementById("rocketRocketCost").className = "";
 		document.getElementById("solarRocket").className = "hidden";
 	}
 }
 
 function launchRocket(){
-	if(rocket >= 1 && rocketFuel >= 20){
-		rocketFuel -= 20;
+	if(rocket >= 1 && getResource(RESOURCE.RocketFuel) >= 20){
+		Game.resources.takeResource(RESOURCE.RocketFuel, 20);
 		rocket -= 1;
 		document.getElementById("spaceRocket").className = "hidden";
 		document.getElementById("collapseInner").className ="collapseInner";
@@ -78,8 +86,8 @@ function explore(planet){
 	};
 
 	if(!planetsData[planet]) return console.error("Cannot explore \"" + planet + "\", data not found.");
-	if(rocketFuel >= planetsData[planet].fuel) {
-		rocketFuel -= planetsData[planet].fuel;
+	if (getResource(RESOURCE.RocketFuel) >= planetsData[planet].fuel) {
+		Game.resources.takeResource(RESOURCE.RocketFuel, planetsData[planet].fuel);
 		document.getElementById("explore" + planet).className = "hidden";
 		buttonsHidden.push("explore" + planet);
 		explored.push(planet.substring(0, 1).toLowerCase() + planet.substring(1));

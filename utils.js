@@ -29,6 +29,18 @@ $.fn.textWidth = function(text, font) {
     return $.fn.textWidth.fakeEl.width();
 };
 
+$.fn.setText = function(text) {
+    if (this.length != 1 || this[0].nodeType != 1) {
+        return this.text(text);
+    }
+    var children = this[0].childNodes;
+    if (children.length != 1 || children[0].nodeType != 3) {
+        return this.text(text);
+    }
+    children[0].nodeValue = text;
+    return this;
+}
+
 Game.utils = (function(){
 
     var instance = {};
@@ -87,9 +99,8 @@ Game.utils = (function(){
         return Game.utils.formatScientificNotation(value, true)
     };
 
-    instance.formatScientificNotation = function(value, useExponentNotation)
-    {
-        if (value === 0 || (Math.abs(value) > 1 && Math.abs(value) < 100))
+    instance.formatScientificNotation = function(value, useExponentNotation){
+        if (value === 0 || (Math.abs(value) > -1000 && Math.abs(value) < 1000))
         {
             return Game.utils.formatRaw(value);
         }
@@ -201,14 +212,31 @@ Game.utils = (function(){
         return hourResult + minuteResult + secondResult + suffix;
     };
 
-    instance.fibonacci = function(n){
+    instance.fibonacci = function(n, multi){
         var a = 0, b = 1, f = 1;
         for(var i = 2; i <= n; i++) {
             f = a + b;
             a = b;
             b = f;
         }
-        return f;
+        return f*(multi||1);
+    };
+
+    instance.pascal = function(n){
+        var add = 1, init = 0;
+        for(var i = 0; i < n; i++){
+            init += add;
+            add += 1;
+        }
+        return init;
+    };
+
+    instance.capitaliseFirst = function(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    };
+
+    instance.randArb = function(min, max){
+        return Math.random() * (max - min) + min;
     };
 
     return instance;

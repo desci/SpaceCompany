@@ -59,6 +59,7 @@ Game.achievementsUI = (function(){
         for(var id in Game.achievements.entries) {
             var data = Game.achievements.entries[id];
             
+            totalAchieved += Game.utils.pascal(data.unlocked+1);
             categoryCounts[data.category].unlocked += data.unlocked + 1;
             categoryCounts[data.category].total += data.brackets.length;
 
@@ -79,9 +80,6 @@ Game.achievementsUI = (function(){
 
         // Calculating Ranks
 
-        for(var category in this.categoryElements) {
-            totalAchieved += categoryCounts[category].unlocked;
-        }
         var x = Game.achievements.rank;
         var xpNeeded = Game.utils.fibonacci(x+7);
         var xpLeft = Game.utils.fibonacci(x+7) - totalAchieved;
@@ -106,7 +104,7 @@ Game.achievementsUI = (function(){
 
         var html = this.entryTemplate(data);
         this.categoryElements[data.category].colc++;
-        this.categoryElements[data.category].col.append($(html));
+        this.categoryElements[data.category].col.append($(html)).find('[data-toggle="tooltip"]').tooltip();
 
         if(this.categoryElements[data.category].colc >= Game.constants.achievementIconsPerRow) {
             this.createCategoryRow(data.category);
@@ -118,9 +116,13 @@ Game.achievementsUI = (function(){
         var div = $('#' + id + "_div");
         var bg = $('#' + id + "_bg");
 
-        div.prop('title', Game.achievements.getAchievementTitle(data));
+        div.attr('data-original-title', Game.achievements.getAchievementTitle(data, true));
 
         div.css('border-color', Game.constants.achievementBracketColors[data.unlocked]);
+        if(data.unlocked == -1){
+            div.css('border-color', '#ffffff');
+            //div.fadeTo(2, 0.2);
+        }
 
         $('#' + id + '_img').width(12 * (data.unlocked + 1));
 

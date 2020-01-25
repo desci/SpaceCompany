@@ -129,6 +129,23 @@ Game.buildingData = (function () {
         }
     });
 
+    instance.plasmaT3 = $.extend({}, baseProducerBuilding, {
+        name: 'Electron Bath',
+        desc: 'Bathing in Electrons. What could go wrong?',
+        resource: 'plasma',
+        resourcePerSecond: {
+            'energy': -15000,
+            'helium': -100,
+            'hydrogen': -100,
+            'plasma': 140
+        },
+        cost: {
+            'lunarite': 6200000,
+            'silicon': 5900000,
+            'meteorite': 12100
+        }
+    });
+
     // Uranium
     instance.uraniumT1 = $.extend({}, baseProducerBuilding, {
         name: 'Grinder',
@@ -286,7 +303,7 @@ Game.buildingData = (function () {
         desc: 'Oil Fields are large open spaces, usually found in deserts where vast oil wells can be found under the ground.',
         resource: 'oil',
         resourcePerSecond: {
-            'energy': -17,
+            'energy': -12,
             'oil': 63
         },
         cost: {
@@ -434,7 +451,7 @@ Game.buildingData = (function () {
     // Charcoal
     instance.charcoalT1 = $.extend({}, baseProducerBuilding, {
         name: 'Woodburner',
-        desc: 'Build an shovel for your woodburner.',
+        desc: 'Build a shovel for your woodburner.',
         resource: 'charcoal',
         resourcePerSecond: {
             'wood': -2,

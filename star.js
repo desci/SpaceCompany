@@ -1,10 +1,12 @@
-Game.interstellarBETA.stars = (function(){
+Game.interstellar.stars = (function(){
 
     var instance = {};
 
     instance.dataVersion = 1;
     instance.entries = {};
     instance.starCount = 0;
+
+    instance.systemsConquered = 0;
     
     instance.initialise = function() {
         for (var id in Game.starData) {
@@ -15,12 +17,15 @@ Game.interstellarBETA.stars = (function(){
                 id: id,
                 htmlId: 'star_' + id,
                 current: 0,
-                displayNeedsUpdate: false
+                spy: 0,
+                explored: false,
+                owned: false,
+                displayNeedsUpdate: false,
             });
             
         }
 
-        console.log("Loaded " + this.starCount + " Stars");
+        console.debug("Loaded " + this.starCount + " Stars");
 
     };
 
@@ -31,9 +36,19 @@ Game.interstellarBETA.stars = (function(){
         }
     };
 
-    instance.unlock = function(id) {
-        this.entries[id].unlocked = true;
-        this.entries[id].displayNeedsUpdate = true;
+    instance.exploreSystem = function(id){
+        if(Game.interstellar.rocket.entries.tier1Rocket.built == true){
+            var data = this.entries[id];
+            var exploreCost = data.distance * 10000;
+            if(antimatter >= exploreCost){
+                antimatter -= exploreCost;
+                data.explored = true;
+                document.getElementById('star_' + id).className = "hidden";
+                document.getElementById('star_' + id + '_conquer').className = "";
+                newNavUnlock('intnav_' + data.factionId);
+                data.displayNeedsUpdate = true;
+            }
+        }
     };
 
     instance.getStarData = function(id) {

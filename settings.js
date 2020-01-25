@@ -14,11 +14,14 @@ Game.settings = (function(){
             boldEnabled: false,
             sidebarCompressed: false,
             notificationsEnabled: true,
+            saveNotifsEnabled: true,
             gainButtonsHidden: false,
             redDestroyButtons: false,
+            hideCompleted: false,
             theme: 'base',
             autoSaveInterval: 30 * 1000
         },
+        elementCache: {},
         reapplyTheme: true
     };
 
@@ -27,72 +30,80 @@ Game.settings = (function(){
         return Game.utils.formatters[format](value.toFixed(digit || 0));
     };
 
+    instance.getEl = function(id) {
+        var element = this.elementCache[id];
+        if(!element) {
+            element = $('#' + id);
+            if(element.length > 0) {
+                this.elementCache[id] = element;
+            }
+        }
+        return element;
+    };
+
     instance.turnRedOnNegative = function(value, id) {
-        var element = $('#' + id);
+        var element = this.getEl(id);
         if(element.length === 0) {
             console.error("Element not found: " + id);
             return;
         }
 
         if(value < 0){
-            element.addClass('red');
             if(this.entries.boldEnabled === true){
-                element.addClass('bold');
+                element.addClass('red bold');
             } else {
+                element.addClass('red');
                 element.removeClass('bold');
             }
 
             return true;
         }
         else{
-            element.removeClass('red');
-            element.removeClass('bold');
+            element.removeClass('red bold');
             return false;
         }
     };
 
     instance.turnRed = function(value, target, id) {
-        var element = $('#' + id);
+        var element = this.getEl(id);
         if(element.length === 0) {
             console.error("Element not found: " + id);
             return;
         }
 
         if(value < target){
-            element.addClass('red');
             if(this.entries.boldEnabled === true){
-                element.addClass('bold');
+                element.addClass('red bold');
             } else {
+                element.addClass('red');
                 element.removeClass('bold');
             }
         }
         else{
-            element.removeClass('red');
-            element.removeClass('bold');
+            element.removeClass('red bold');
         }
     };
 
     instance.turnRedOrGreen = function(value, target, id) {
-        var element = $('#' + id);
+        var element = this.getEl(id);
         if(element.length === 0) {
             console.error("Element not found: " + id);
             return;
         }
 
-        if(value == 0){
-            element.addClass('red');
+        if(value === 0){
             if(this.entries.boldEnabled === true){
-                element.addClass('bold');
+                element.addClass('red bold');
             } else {
+                element.addClass('red');
                 element.removeClass('bold');
             }
         }
         else{
-            element.removeClass('red');
-            element.removeClass('bold');
+            element.removeClass('red bold');
         }
 
-        if(value >= target) {
+        if(value >= target && target >= 0) {
             element.addClass('green');
         } else {
             element.removeClass('green');
@@ -109,6 +120,8 @@ Game.settings = (function(){
     instance.load = function(data) {
         this.loadLegacy(data);
 
+        console.log(this.entries.hideCompleted)
+
         if(data.statistics) {
             if(data.statistics.version && data.statistics.version === this.dataVersion) {
                 for(var id in data.statistics.entries) {
@@ -117,13 +130,17 @@ Game.settings = (function(){
             }
         }
 
+        console.log(this.entries.hideCompleted)
+
         $('#formatSelector').val(this.entries.formatter);
         $('#themeSelector').val(this.entries.theme);
         $('#boldEnabled').prop('checked', this.entries.boldEnabled);
         $('#sidebarCompressed').prop('checked', this.entries.sidebarCompressed);
         $('#notificationsEnabled').prop('checked', this.entries.notificationsEnabled);
+        $('#saveNotifsEnabled').prop('checked', this.entries.saveNotifsEnabled);
         $('#gainButtonsHidden').prop('checked', this.entries.gainButtonsHidden);
         $('#redDestroyButtons').prop('checked', this.entries.redDestroyButtons);
+        $('#hideCompleted').prop('checked', this.entries.hideCompleted);
 
         if(Game.settings.entries.sidebarCompressed === true){
             for(var i = 0; i < document.getElementsByClassName("sideTab").length; i ++){
@@ -144,6 +161,17 @@ Game.settings = (function(){
         else{
             for(var i = 0; i < document.getElementsByClassName("gainButton").length; i ++){
                 document.getElementsByClassName("gainButton")[i].className = "gainButton";
+            }
+        }
+
+        if(Game.settings.entries.hideCompleted === true){
+            for(var i = 0; i < document.getElementsByClassName("completed").length; i ++){
+                document.getElementsByClassName("completed")[i].className = "completed hidden";
+            }
+        }
+        else{
+            for(var i = 0; i < document.getElementsByClassName("completed").length; i ++){
+                document.getElementsByClassName("completed")[i].className = "completed";
             }
         }
         
@@ -200,6 +228,10 @@ Game.settings = (function(){
             Game.settings.set('notificationsEnabled', $(this).is(':checked'));
         });
 
+        $('#saveNotifsEnabled').change(function(){
+            Game.settings.set('saveNotifsEnabled', $(this).is(':checked'));
+        });
+
         $('#gainButtonsHidden').change(function(){
             Game.settings.set('gainButtonsHidden', $(this).is(':checked'));
             if(Game.settings.entries.gainButtonsHidden === true){
@@ -216,7 +248,7 @@ Game.settings = (function(){
 
         $('#redDestroyButtons').change(function(){
             Game.settings.set('redDestroyButtons', $(this).is(':checked'));
-            if(contains(researched, "unlockDestruction")){
+            if (Game.tech.isPurchased('unlockDestruction')) {
                 if(Game.settings.entries.redDestroyButtons === true){
                     for(var i = 0; i < document.getElementsByClassName("destroy").length; i ++){
                         document.getElementsByClassName("destroy")[i].className = "btn btn-danger destroy";
@@ -230,7 +262,7 @@ Game.settings = (function(){
             }
         });
 
-        if(contains(researched, "unlockDestruction")){
+        if (Game.tech.isUnlocked('unlockDestruction')) {
             if(Game.settings.entries.redDestroyButtons === true){
                 for(var i = 0; i < document.getElementsByClassName("destroy").length; i ++){
                     document.getElementsByClassName("destroy")[i].className = "btn btn-danger destroy";
@@ -243,6 +275,20 @@ Game.settings = (function(){
                 }
             }
         }
+
+        $('#hideCompleted').change(function(){
+            Game.settings.set('hideCompleted', $(this).is(':checked'));
+            if(Game.settings.entries.hideCompleted === true){
+                for(var i = 0; i < document.getElementsByClassName("completed").length; i ++){
+                    document.getElementsByClassName("completed")[i].className = "completed hidden";
+                }
+            }
+            else{
+                for(var i = 0; i < document.getElementsByClassName("completed").length; i ++){
+                    document.getElementsByClassName("completed")[i].className = "completed";
+                }
+            }
+        });
 
         for (var id in autoSaveMapping) {
             var element = $('#' + id);
@@ -275,7 +321,7 @@ Game.settings = (function(){
     };
 
     instance.updateCompanyName = function(){
-        document.getElementById("companyName").innerHTML = companyName;
+      document.getElementById("companyName").textContent = companyName;
     }
 
     return instance;

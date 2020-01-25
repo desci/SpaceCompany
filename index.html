@@ -9,8 +9,8 @@
 	<link href="lib/pnotify.custom.min.css" rel="stylesheet" type="text/css">
 	<link href="https://fonts.googleapis.com/css?family=Orbitron" rel="stylesheet">
 	<link href="style.css" rel="stylesheet">
-	<!--<script src='https://cdn1.kongregate.com/javascripts/kongregate_api.js'></script>
-	<script>
+	<script src='https://cdn1.kongregate.com/javascripts/kongregate_api.js'></script>
+	<!-- <script>
 		kongregateAPI.loadAPI(function(){
 			window.kongregate = kongregateAPI.getAPI();
 			console.log("KongregateAPI Loaded");
@@ -18,7 +18,7 @@
 			// Proceed with loading your game...
 		});
 
-	</script>-->
+	</script> -->
 	<script>
 	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -43,7 +43,7 @@
 		Reticulating Splines...
 	</div>
 </div>
-<script type="text/javascript" src="data/spalshTextData.js"></script>
+<script type="text/javascript" src="data/splashTextData.js"></script>
 <div id="game" class="container hidden" style="width:95%; margin: auto;">
 
 	<!--  Bar at top of screen -->
@@ -64,6 +64,9 @@
 						Energy Deficit!
 					</span>
 				</a>
+				<a class="navbar-brand pointer" target="_blank" href="http://discord.gg/hgRUjVp">
+					<span class="text-muted small">Join our Discord!</span>
+				</a>
 				<div class="pull-right" style="width:200px;">
 					<a class="navbar-brand">
 						<span id="autoSaveTimer" class="text-muted small ng-binding" style="font-size:14px;">
@@ -77,11 +80,7 @@
 		<div class="ng-binding"></div>
 	</div>
 	<div height="30"></div>
-	<div id="updateAlert" class="alert alert-info alert-dismissable fade in">
-	    <button href="#" class="close btn.btn-info" data-dismiss="alert" aria-label="close">Close</button>
-	    <strong>New Update!</strong> These are the features since you last played (V0.4.4.8 onwards):<br>
-	    <ul id="updateLog"></ul>
-	 </div>
+	<span id="updateBox"></span>
 
 <!-- Nav tabs -->
 	<ul class="nav nav-tabs no-select" role="tablist" id="tabList">
@@ -91,7 +90,6 @@
     	<li role="presentation" id="wonderTab" class="hidden"><a href="#wonder" aria-control="wonder" role="tab" data-toggle="tab"onclick="tabClicked('wonder')"><div id="wonderTabGlyph" class="glyphicon glyphicon-exclamation-sign hidden"></div> Wonders</a></li>
     	<li role="presentation" id="solCenterTopTab" class="hidden"><a href="#solCenterPage" aria-control="solCenterPage" role="tab" data-toggle="tab"onclick="tabClicked('solCenter')"><div id="solCenterTabGlyph" class="glyphicon glyphicon-exclamation-sign hidden"></div> Sol Center</a></li>
     	<li role="presentation" id="machineTopTab" style="display: none;"><a href="#machineTab" aria-control="machineTab" role="tab" data-toggle="tab"onclick="tabClicked('machine')"><div id="machineTabGlyph" class="glyphicon glyphicon-exclamation-sign hidden"></div> Machines</a></li>
-    	<li role="presentation" id="interstellarTab" class="hidden"><a href="#interstellar" aria-control="interstellar" role="tab" data-toggle="tab"onclick="tabClicked('interstellar')"><div id="interstellarTabGlyph" class="glyphicon glyphicon-exclamation-sign hidden"></div> Interstellar</a></li>
     	<li role="presentation" class="pull-right"><a href="#help" aria-control="help" role="tab" data-toggle="tab"><div class="glyphicon glyphicon-info-sign"></div> Help / FAQ</a></li>
     	<li role="presentation" class="pull-right"><a href="#more" aria-control="more" role="tab" data-toggle="tab" onclick="tabClicked('more')"><div id="moreTabGlyph" class="glyphicon glyphicon-exclamation-sign hidden"></div> More...</a></li>
 	</ul>
@@ -555,14 +553,14 @@
 									<span>
 										Plasma is the 4th state of matter and is used by Tier 4 machines and large space structures as an extreme power source for your company. At first you can hold 100,000 plasma at once, but you can unlock and purchase Plasma Storage Units to increase this number.
 										<br>
-										Time remaining until full storage: <b><span id="plasmaFullTime">N/A</span></b>
+										Time remaining until <span id="plasmaLimitType">full</span> storage: <b><span id="plasmaLimitTime">N/A</span></b>
 										<br>
 										1 Plasma is created by infusing <span id="manualPlasmaHydrogenCost">10</span> Hydrogen with <span id="manualPlasmaEnergyCost">1000</span> Energy.
 									</span>
 									<br>
 									<br>
 									<hide class="gainButton">
-										<div onclick="gainPlasma()" class="btn btn-default">Gain 1</div>
+										<div onclick="gainResource('plasma')" class="btn btn-default">Gain <span id="plasmaGain">1</span></div>
 										<br>
 										<br>
 									</hide>
@@ -606,7 +604,7 @@
 									<span>
 										The Super-Heater throws electricity at Hydrogen to turn it into a plasmatic substance.
 										<br>
-										Uses 1000 Energy and 10 Hydrogen per second.
+										Uses 1,000 Energy and 10 Hydrogen per second.
 										<br>
 										Produces 1 Plasma per second.
 										<br>
@@ -616,7 +614,7 @@
 									<br>
 									<button onclick="getHeater()" class="btn btn-default">Get Super-Heater</button>
 									<button onclick="toggleHeater()" class="btn btn-default">Turn Super-Heater <span id="heaterToggled">Off</span></button>
-									<button onclick="destroyMachine(heater, 'heater')" class="btn btn-default destroy hidden">Destroy Super-Heater</button>
+									<button onclick="destroyMachine('heater')" class="btn btn-default destroy hidden">Destroy Super-Heater</button>
 								</td>
 							</tr>
 							<tr id="plasmaTier2" class="hidden">
@@ -627,7 +625,7 @@
 									<span>
 										This contraption converts Helium into Plasma through firing intensive energy bolts at the gas cloud.
 										<br>
-										Uses 8500 Energy and 80 Helium per second.
+										Uses 8,500 Energy and 80 Helium per second.
 										<br>
 										Produces 10 Plasma per second.
 										<br>
@@ -637,7 +635,28 @@
 									<br>
 									<button onclick="getPlasmatic()" class="btn btn-default">Get Plasmatic Pit</button>
 									<button onclick="togglePlasmatic()" class="btn btn-default">Turn Plasmatic Pit <span id="plasmaticToggled">Off</span></button>
-									<button onclick="destroyMachine(plasmatic, 'plasmatic')" class="btn btn-default destroy hidden">Destroy Plasmatic Pit</button>
+									<button onclick="destroyMachine('plasmatic')" class="btn btn-default destroy hidden">Destroy Plasmatic Pit</button>
+								</td>
+							</tr>
+							<tr id="plasmaTier3" class="hidden">
+								<td>
+									<h3 class="default btn-link">
+										Electron Bath: <span id="bath">0</span>
+									</h3>
+									<span>
+										Bathing in Electrons. What could go wrong?
+										<br>
+										Uses 15,000 Energy and 100 Helium and 100 Hydrogen per second.
+										<br>
+										Produces 140 Plasma per second.
+										<br>
+										Costs <span id="bathLavaCost">6.20M</span> Lava, <span id="bathGoldCost">5.90M</span> Gold, <span id="bathMeteoriteCost">12,100</span> Meteorite.
+									</span>
+									<br>
+									<br>
+									<button onclick="getBath()" class="btn btn-default">Get Electron Bath</button>
+									<button onclick="toggleBath()" class="btn btn-default">Turn Electron Bath <span id="bathToggled">Off</span></button>
+									<button onclick="destroyMachine('bath')" class="btn btn-default destroy hidden">Destroy Electron Bath</button>
 								</td>
 							</tr>
 						</table>
@@ -654,7 +673,7 @@
 									<span>
 										Energy is created by power sources such as steam engines, solar power and advances even to fusion power and nuclear energy. The maximum you can hold to start with is 100,000 Energy, but batteries are unlockable which can increase this.
 										<br>
-										Time remaining until full storage: <b><span id="energyFullTime">N/A</span></b>
+										Time remaining until <span id="energyLimitType">full</span> storage: <b><span id="energyLimitTime">N/A</span></b>
 										<br>
 									</span>
 									<br>
@@ -721,6 +740,21 @@
 									<button onclick="getBatteryT4()" class="btn btn-default">Get Battery T4</button>
 								</td>
 							</tr>
+							<tr id="batteriesT5" class="hidden">
+								<td>
+									<h3 class="default btn-link">
+										T5 Batteries: <span id="batteryT5">0</span>
+									</h3>
+									<span>
+										Tier 5 Batteries increase your energy storage by 500,000,000 per battery built.
+										<br>
+										Costs <span id="batteryT5MetalCost">490,000,000</span> Metal, <span id="batteryT5GemCost">490,000,000</span> Gems, <span id="batteryT5LunariteCost">290,000,000</span> Lunarite.
+									</span>
+									<br>
+									<br>
+									<button onclick="getBatteryT5()" class="btn btn-default">Get Battery T5</button>
+								</td>
+							</tr>
 							<tr>
 								<td>
 									<h3 class="default btn-link">
@@ -736,7 +770,7 @@
 									<br>
 									<br>
 									<button onclick="getCharcoalEngine()" class="btn btn-default">Get Charcoal Engine</button>
-									<button onclick="destroyMachine(charcoalEngine, 'charcoalEngine')" class="btn btn-default destroy hidden">Destroy Charcoal Engine</button>
+									<button onclick="destroyMachine('charcoalEngine')" class="btn btn-default destroy hidden">Destroy Charcoal Engine</button>
 								</td>
 							</tr>
 							<tr id="solarPower" class="hidden">
@@ -754,7 +788,7 @@
 									<br>
 									<br>
 									<button onclick="getSolarPanel()" class="btn btn-default">Get Solar Panel</button>
-									<button onclick="destroyMachine(solarPanel, 'solarPanel')" class="btn btn-default destroy hidden">Destroy Solar Panel</button>
+									<button onclick="destroyMachine('solarPanel')" class="btn btn-default destroy hidden">Destroy Solar Panel</button>
 								</td>
 							</tr>
 							<tr id="methanePower" class="hidden">
@@ -772,7 +806,7 @@
 									<br>
 									<br>
 									<button onclick="getMethaneStation()" class="btn btn-default">Get Methane Power Station</button>
-									<button onclick="destroyMachine(methaneStation, 'methaneStation')" class="btn btn-default destroy hidden">Destroy Methane Station</button>
+									<button onclick="destroyMachine('methaneStation')" class="btn btn-default destroy hidden">Destroy Methane Station</button>
 								</td>
 							</tr>
 							<tr id="nuclearPower" class="hidden">
@@ -790,7 +824,7 @@
 									<br>
 									<br>
 									<button onclick="getNuclearStation()" class="btn btn-default">Get Nuclear Power Station</button>
-									<button onclick="destroyMachine(nuclearStation, 'nuclearStation')" class="btn btn-default destroy hidden">Destroy Nuclear Station</button>
+									<button onclick="destroyMachine('nuclearStation')" class="btn btn-default destroy hidden">Destroy Nuclear Station</button>
 								</td>
 							</tr>
 							<tr id="magmaticPower" class="hidden">
@@ -808,7 +842,7 @@
 									<br>
 									<br>
 									<button onclick="getMagmatic()" class="btn btn-default">Get Magmatic Dynamo</button>
-									<button onclick="destroyMachine(magmatic, 'magmatic')" class="btn btn-default destroy hidden">Destroy Magmatic Dynamo</button>
+									<button onclick="destroyMachine('magmatic')" class="btn btn-default destroy hidden">Destroy Magmatic Dynamo</button>
 								</td>
 							</tr>
 							<tr id="fusionPower" class="hidden">
@@ -826,7 +860,7 @@
 									<br>
 									<br>
 									<button onclick="getFusionReactor()" class="btn btn-default">Get Fusion Reactor</button>
-									<button onclick="destroyMachine(fusionReactor, 'fusionReactor')" class="btn btn-default destroy hidden">Destroy Fusion Reactor</button>
+									<button onclick="destroyMachine('fusionReactor')" class="btn btn-default destroy hidden">Destroy Fusion Reactor</button>
 								</td>
 							</tr>
 						</table>
@@ -846,7 +880,7 @@
 									<hide class="gainButton">
 									<br>
 									<br>
-									<div onclick="gainUranium()" class="btn btn-default">Gain 1</div>
+									<div onclick="gainResource('uranium')" class="btn btn-default">Gain <span id="uraniumGain">1</span></div>
 									</hide>
 									<br>
 									<br>
@@ -860,7 +894,7 @@
 									<span>
 										Upgrade your Uranium storage size to <span id="uraniumNextStorage">100</span>.
 										<br>
-										Time remaining until full storage: <b><span id="uraniumFullTime">N/A</span></b>
+										Time remaining until <span id="uraniumLimitType">full</span> storage: <b><span id="uraniumLimitTime">N/A</span></b>
 										<br>
 										Costs <span id="uraniumStorageCost">50</span> Uranium, <span id="uraniumStorageLunariteCost">20</span> Lunarite.
 									</span>
@@ -884,7 +918,7 @@
 									<br>
 									<br>
 									<button onclick="getGrinder()" class="btn btn-default">Get Grinder</button>
-									<button onclick="destroyMachine(grinder, 'grinder')" class="btn btn-default destroy hidden">Destroy Grinder</button>
+									<button onclick="destroyMachine('grinder')" class="btn btn-default destroy hidden">Destroy Grinder</button>
 								</td>
 							</tr>
 							<tr>
@@ -904,7 +938,7 @@
 									<br>
 									<br>
 									<button onclick="getCubic()" class="btn btn-default">Get Cubic Teleposer</button>
-									<button onclick="destroyMachine(cubic, 'cubic')" class="btn btn-default destroy hidden">Destroy Cubic Teleposer</button>
+									<button onclick="destroyMachine('cubic')" class="btn btn-default destroy hidden">Destroy Cubic Teleposer</button>
 								</td>
 							</tr>
 							<tr id="uraniumTier3" class="hidden">
@@ -924,7 +958,7 @@
 									<br>
 									<br>
 									<button onclick="getEnricher()" class="btn btn-default">Get Uranium Enricher</button>
-									<button onclick="destroyMachine(enricher, 'enricher')" class="btn btn-default destroy hidden">Destroy Uranium Enricher</button>
+									<button onclick="destroyMachine('enricher')" class="btn btn-default destroy hidden">Destroy Uranium Enricher</button>
 								</td>
 							</tr>
 							<tr id="uraniumTier4" class="hidden">
@@ -944,7 +978,27 @@
 									<br>
 									<br>
 									<button onclick="getRecycler()" class="btn btn-default">Get Yellowcake Recycler</button>
-									<button onclick="destroyMachine(recycler, 'recycler')" class="btn btn-default destroy hidden">Destroy Yellowcake Recycler</button>
+									<button onclick="destroyMachine('recycler')" class="btn btn-default destroy hidden">Destroy Yellowcake Recycler</button>
+								</td>
+							</tr>
+							<tr id="uraniumTier5" class="hidden">
+								<td>
+									<h3 class="default btn-link">
+										Planetary Nuclear Plant: <span id="planetNuke">0</span>
+									</h3>
+									<span>
+										This huge factory is as large as a planet, fusing together Uranium from common elements.
+										<br>
+										Produces 2412 Uranium per second.
+										<br>
+										Uses 2719 Energy per second.
+										<br>
+										Costs <span id='planetNukeTitaniumCost'>486000</span> Titanium, <span id='planetNukeSiliconCost'>266000</span> Silicon, <span id='planetNukeIceCost'>364000</span> Ice
+									</span>
+									<br>
+									<br>
+									<button onclick="getPlanetNuke()" class="btn btn-default">Get Planetary Nuclear Plant</button>
+									<button onclick="destroyMachine('planetNuke')" class="btn btn-default destroy hidden">Destroy Planetary Nuclear Plant</button>
 								</td>
 							</tr>
 						</table>
@@ -964,7 +1018,7 @@
 									<hide class="gainButton">
 									<br>
 									<br>
-									<div onclick="gainOil()" class="btn btn-default">Gain 1</div>
+									<div onclick="gainResource('oil')" class="btn btn-default">Gain <span id="oilGain">1</span></div>
 									</hide>
 								</td>
 							</tr>
@@ -976,7 +1030,7 @@
 									<span>
 										Upgrade your Oil storage size to <span id="oilNextStorage">100</span>.
 										<br>
-										Time remaining until full storage: <b><span id="oilFullTime">N/A</span></b>
+										Time remaining until <span id="oilLimitType">full</span> storage: <b><span id="oilLimitTime">N/A</span></b>
 										<br>
 										Costs <span id="oilStorageCost">50</span> Oil, <span id="oilStorageMetalCost">20</span> Metal.
 									</span>
@@ -1000,10 +1054,10 @@
 									<br>
 									<br>
 									<button onclick="getPump()" class="btn btn-default">Get Pump</button>
-									<button onclick="destroyMachine(pump, 'pump')" class="btn btn-default destroy hidden">Destroy Small Pump</button>
+									<button onclick="destroyMachine('pump')" class="btn btn-default destroy hidden">Destroy Small Pump</button>
 								</td>
 							</tr>
-							<tr id="oilMachine1" class="hidden">
+							<tr id="oilTier2" class="hidden">
 								<td>
 									<h3 class="default btn-link">
 										Pumpjack: <span id="pumpjack">0</span>
@@ -1018,7 +1072,7 @@
 									<br>
 									<br>
 									<button onclick="getPumpjack()" class="btn btn-default">Get Pumpjack</button>
-									<button onclick="destroyMachine(pumpjack, 'pumpjack')" class="btn btn-default destroy hidden">Destroy Pumpjack</button>
+									<button onclick="destroyMachine('pumpjack')" class="btn btn-default destroy hidden">Destroy Pumpjack</button>
 								</td>
 							</tr>
 							<tr id="oilTier3" class="hidden">
@@ -1031,14 +1085,14 @@
 										<br>
 										Produces 63 Oil per second.
 										<br>
-										Uses 17 Energy per second.
+										Uses 12 Energy per second.
 										<br>
 										Costs <span id="oilFieldLunariteCost">2,400</span> Lunarite, <span id="oilFieldTitaniumCost">2,700</span> Titanium, <span id="oilFieldSiliconCost">3,900</span> Silicon.
 									</span>
 									<br>
 									<br>
 									<button onclick="getOilField()" class="btn btn-default">Get Oil Field</button>
-									<button onclick="destroyMachine(oilField, 'oilField')" class="btn btn-default destroy hidden">Destroy Oil Field</button>
+									<button onclick="destroyMachine('oilField')" class="btn btn-default destroy hidden">Destroy Oil Field</button>
 								</td>
 							</tr>
 							<tr id="oilTier4" class="hidden">
@@ -1058,7 +1112,27 @@
 									<br>
 									<br>
 									<button onclick="getOilRig()" class="btn btn-default">Get Offshore Rig</button>
-									<button onclick="destroyMachine(oilRig, 'oilRig')" class="btn btn-default destroy hidden">Destroy Offshore Rig</button>
+									<button onclick="destroyMachine('oilRig')" class="btn btn-default destroy hidden">Destroy Offshore Rig</button>
+								</td>
+							</tr>
+							<tr id="oilTier5" class="hidden">
+								<td>
+									<h3 class="default btn-link">
+										Fossilator 9000: <span id="fossilator">0</span>
+									</h3>
+									<span>
+										Much better than the 8000 version, this fossilator reverses the fossil fuel cycle. Instead of burning, it creates them from carbon in the air.
+										<br>
+										Produces 2627 Oil per second.
+										<br>
+										Uses 258 Energy per second.
+										<br>
+										Costs <span id='fossilatorUraniumCost'>110000</span> Uranium, <span id='fossilatorCharcoalCost'>96000</span> Charcoal, <span id='fossilatorLavaCost'>167000</span> Lava.
+									</span>
+									<br>
+									<br>
+									<button onclick="getFossilator()" class="btn btn-default">Get Fossilator 9000</button>
+									<button onclick="destroyMachine('fossilator')" class="btn btn-default destroy hidden">Destroy Fossilator 9000</button>
 								</td>
 							</tr>
 						</table>
@@ -1078,7 +1152,7 @@
 									<hide class="gainButton">
 									<br>
 									<br>
-									<div onclick="gainMetal()" class="btn btn-default">Gain 1</div>
+									<div onclick="gainResource('metal')" class="btn btn-default">Gain <span id="metalGain">1</span></div>
 									</hide>
 									<br>
 									<br>
@@ -1092,7 +1166,7 @@
 									<span>
 										Upgrade your Metal storage size to <span id="metalNextStorage">100</span>.
 										<br>
-										Time remaining until full storage: <b><span id="metalFullTime">N/A</span></b>
+										Time remaining until <span id="metalLimitType">full</span> storage: <b><span id="metalLimitTime">N/A</span></b>
 										<br>
 										Costs <span id="metalStorageCost">50</span> Metal.
 									</span>
@@ -1116,10 +1190,10 @@
 									<br>
 									<br>
 									<button onclick="getMiner()" class="btn btn-default">Get Miner</button>
-									<button onclick="destroyMachine(miner, 'miner')" class="btn btn-default destroy hidden">Destroy Miner</button>
+									<button onclick="destroyMachine('miner')" class="btn btn-default destroy hidden">Destroy Miner</button>
 								</td>
 							</tr>
-							<tr id="metalMachine1" class="hidden">
+							<tr id="metalTier2" class="hidden">
 								<td>
 									<h3 class="default btn-link">
 										Heavy Drill: <span id="heavyDrill">0</span>
@@ -1136,7 +1210,7 @@
 									<br>
 									<br>
 									<button onclick="getHeavyDrill()" class="btn btn-default">Get Heavy Drill</button>
-									<button onclick="destroyMachine(heavyDrill, 'heavyDrill')" class="btn btn-default destroy hidden">Destroy Heavy Drill</button>
+									<button onclick="destroyMachine('heavyDrill')" class="btn btn-default destroy hidden">Destroy Heavy Drill</button>
 								</td>
 							</tr>
 							<tr id="metalTier3" class="hidden">
@@ -1156,7 +1230,7 @@
 									<br>
 									<br>
 									<button onclick="getGigaDrill()" class="btn btn-default">Get Giga Drill</button>
-									<button onclick="destroyMachine(gigaDrill, 'gigaDrill')" class="btn btn-default destroy hidden">Destroy Giga Drill</button>
+									<button onclick="destroyMachine('gigaDrill')" class="btn btn-default destroy hidden">Destroy Giga Drill</button>
 								</td>
 							</tr>
 							<tr id="metalTier4" class="hidden">
@@ -1165,7 +1239,7 @@
 										Quantum Drill: <span id="quantumDrill">0</span>
 									</h3>
 									<span>
-										Quantum Drills bend the space-time continuum to get metal faster than physically possible.
+										Quantum Drills bend the space-time continuum to get metal faster than conventional methods.
 										<br>
 										They produce 427 Metal per second.
 										<br>
@@ -1176,7 +1250,27 @@
 									<br>
 									<br>
 									<button onclick="getQuantumDrill()" class="btn btn-default">Get Quantum Drill</button>
-									<button onclick="destroyMachine(quantumDrill, 'quantumDrill')" class="btn btn-default destroy hidden">Destroy Quantum Drill</button>
+									<button onclick="destroyMachine('quantumDrill')" class="btn btn-default destroy hidden">Destroy Quantum Drill</button>
+								</td>
+							</tr>
+							<tr id="metalTier5" class="hidden">
+								<td>
+									<h3 class="default btn-link">
+										Multiverse Drill: <span id="multiDrill">0</span>
+									</h3>
+									<span>
+										Drills metal from alternate realities where metal is plentiful .
+										<br>
+										They produce 4768 Metal per second.
+										<br>
+										They use 131 Energy per second.
+										<br>
+										Costs <span id='multiDrillTitaniumCost'>184000</span> Titanium, <span id='multiDrillGoldCost'>133000</span> Gold, <span id='multiDrillOilCost'>170000</span> Oil.
+									</span>
+									<br>
+									<br>
+									<button onclick="getMultiDrill()" class="btn btn-default">Get Multiverse Drill</button>
+									<button onclick="destroyMachine('multiDrill')" class="btn btn-default destroy hidden">Destroy Multiverse Drill</button>
 								</td>
 							</tr>
 						</table>
@@ -1196,7 +1290,7 @@
 									<hide class="gainButton">
 									<br>
 									<br>
-									<div onclick="gainGem()" class="btn btn-default">Gain 1</div>
+									<div onclick="gainResource('gem')" class="btn btn-default">Gain <span id="gemGain">1</span></div>
 									</hide>
 									<br>
 									<br>
@@ -1210,7 +1304,7 @@
 									<span>
 										Upgrade your gem storage size to <span id="gemNextStorage">100</span>.
 										<br>
-										Time remaining until full storage: <b><span id="gemFullTime">N/A</span></b>
+										Time remaining until <span id="gemLimitType">full</span> storage: <b><span id="gemLimitTime">N/A</span></b>
 										<br>
 										Costs <span id="gemStorageCost">50</span> Gems, <span id="gemStorageMetalCost">20</span> Metal.
 									</span>
@@ -1234,10 +1328,10 @@
 									<br>
 									<br>
 									<button onclick="getGemMiner()" class="btn btn-default">Get Gem Miner</button>
-									<button onclick="destroyMachine(gemMiner, 'gemMiner')" class="btn btn-default destroy hidden">Destroy Gem Miner</button>
+									<button onclick="destroyMachine('gemMiner')" class="btn btn-default destroy hidden">Destroy Gem Miner</button>
 								</td>
 							</tr>
-							<tr id="gemMachine1" class="hidden">
+							<tr id="gemTier2" class="hidden">
 								<td>
 									<h3 class="default btn-link">
 										Advanced Drill: <span id="advancedDrill">0</span>
@@ -1254,7 +1348,7 @@
 									<br>
 									<br>
 									<button onclick="getAdvancedDrill()" class="btn btn-default">Get Advanced Drill</button>
-									<button onclick="destroyMachine(advancedDrill, 'advancedDrill')" class="btn btn-default destroy hidden">Destroy Advanced Drill</button>
+									<button onclick="destroyMachine('advancedDrill')" class="btn btn-default destroy hidden">Destroy Advanced Drill</button>
 								</td>
 							</tr>
 							<tr id="gemTier3" class="hidden">
@@ -1274,7 +1368,7 @@
 									<br>
 									<br>
 									<button onclick="getDiamondDrill()" class="btn btn-default">Get Diamond Drill</button>
-									<button onclick="destroyMachine(diamondDrill, 'diamondDrill')" class="btn btn-default destroy hidden">Destroy Diamond Drill</button>
+									<button onclick="destroyMachine('diamondDrill')" class="btn btn-default destroy hidden">Destroy Diamond Drill</button>
 								</td>
 							</tr>
 							<tr id="gemTier4" class="hidden">
@@ -1294,7 +1388,27 @@
 									<br>
 									<br>
 									<button onclick="getCarbyneDrill()" class="btn btn-default">Get Carbyne Drill</button>
-									<button onclick="destroyMachine(carbyneDrill, 'carbyneDrill')" class="btn btn-default destroy hidden">Destroy Carbyne Drill</button>
+									<button onclick="destroyMachine('carbyneDrill')" class="btn btn-default destroy hidden">Destroy Carbyne Drill</button>
+								</td>
+							</tr>
+							<tr id="gemTier5" class="hidden">
+								<td>
+									<h3 class="default btn-link">
+										Diamond Accretion Chamber: <span id="diamondChamber">0</span>
+									</h3>
+									<span>
+										This special container condenses carbon dioxide gas into diamonds, creating gems at a faster rate than any drill.
+										<br>
+										Produces 3747 Gems per second.
+										<br>
+										Uses 260 Energy per second.
+										<br>
+										Costs <span id='diamondChamberUraniumCost'>181,000</span> Uranium, <span id='diamondChamberCharcoalCost'>185,000</span> Charcoal, <span id='diamondChamberMeteoriteCost'>12,500</span> Meteorite.
+									</span>
+									<br>
+									<br>
+									<button onclick="getDiamondChamber()" class="btn btn-default">Get Diamond Accretion Chamber</button>
+									<button onclick="destroyMachine('diamondChamber')" class="btn btn-default destroy hidden">Destroy Diamond Accretion Chamber</button>
 								</td>
 							</tr>
 						</table>
@@ -1314,7 +1428,7 @@
 									</span>
 									<br>
 									<hide class="gainButton">
-									<div onclick="gainCharcoal()" class="btn btn-default">Convert 1</div>
+									<div onclick="gainResource('charcoal')" class="btn btn-default">Convert <span id="charcoalGain">1</span></div>
 									</hide>
 									<button onclick="toggleCharcoal()" class="btn btn-default">Turn Charcoal Production <span id="charcoalToggled">Off</span></button>
 									<br>
@@ -1329,7 +1443,7 @@
 									<span>
 										Upgrade your Charcoal storage size to <span id="charcoalNextStorage">100</span>.
 										<br>
-										Time remaining until full storage: <b><span id="charcoalFullTime">N/A</span></b>
+										Time remaining until <span id="charcoalLimitType">full</span> storage: <b><span id="charcoalLimitTime">N/A</span></b>
 										<br>
 										Costs <span id="charcoalStorageCost">50</span> Charcoal, <span id="charcoalStorageMetalCost">20</span> Metal.
 									</span>
@@ -1344,7 +1458,7 @@
 										Woodburner: <span id="woodburner">0</span>
 									</h3>
 									<span>
-										Build an shovel for your woodburner.
+										Build a shovel for your woodburner.
 										<br>
 										Produces 1 Charcoal per second.
 										<br>
@@ -1355,10 +1469,10 @@
 									<br>
 									<br>
 									<button onclick="getWoodburner()" class="btn btn-default">Get Woodburner</button>
-									<button onclick="destroyMachine(woodburner, 'woodburner')" class="btn btn-default destroy hidden">Destroy Woodburner</button>
+									<button onclick="destroyMachine('woodburner')" class="btn btn-default destroy hidden">Destroy Woodburner</button>
 								</td>
 							</tr>
-							<tr id="charcoalMachine1" class="hidden">
+							<tr id="charcoalTier2" class="hidden">
 								<td>
 									<h3 class="default btn-link">
 										Furnace: <span id="furnace">0</span>
@@ -1377,7 +1491,7 @@
 									<br>
 									<br>
 									<button onclick="getFurnace()" class="btn btn-default">Get Furnace</button>
-									<button onclick="destroyMachine(furnace, 'furnace')" class="btn btn-default destroy hidden">Destroy Furnace</button>
+									<button onclick="destroyMachine('furnace')" class="btn btn-default destroy hidden">Destroy Furnace</button>
 								</td>
 							</tr>
 							<tr id="charcoalTier3" class="hidden">
@@ -1386,7 +1500,7 @@
 										Industrial Kiln: <span id="kiln">0</span>
 									</h3>
 									<span>
-										These large kilns are much for effective than previous methods of creating charcoal and use less wood to make the same amount as a furnace.
+										These large kilns are much more effective than previous methods of creating charcoal and use less wood to make the same amount as a furnace.
 										<br>
 										Produces 53 Charcoal per second.
 										<br>
@@ -1399,7 +1513,7 @@
 									<br>
 									<br>
 									<button onclick="getKiln()" class="btn btn-default">Get Industrial Kiln</button>
-									<button onclick="destroyMachine(kiln, 'kiln')" class="btn btn-default destroy hidden">Destroy Industrial Kiln</button>
+									<button onclick="destroyMachine('kiln')" class="btn btn-default destroy hidden">Destroy Industrial Kiln</button>
 								</td>
 							</tr>
 							<tr id="charcoalTier4" class="hidden">
@@ -1421,7 +1535,29 @@
 									<br>
 									<br>
 									<button onclick="getFryer()" class="btn btn-default">Get Forest Fryer</button>
-									<button onclick="destroyMachine(fryer, 'fryer')" class="btn btn-default destroy hidden">Destroy Forest Fryer</button>
+									<button onclick="destroyMachine('fryer')" class="btn btn-default destroy hidden">Destroy Forest Fryer</button>
+								</td>
+							</tr>
+							<tr id="charcoalTier5" class="hidden">
+								<td>
+									<h3 class="default btn-link">
+										Microverse Pollutor: <span id="microPollutor">0</span>
+									</h3>
+									<span>
+										Using Nano-technology, tiny universes can be created, filled with toxic gases from charcoal production and simply deleted. Cross-dimensional pollution at a completely new level!
+										<br>
+										Produces 2267 Charcoal per second.
+										<br>
+										Uses 950 Wood per second.
+										<br>
+										Uses 187 Energy per second.
+										<br>
+										Costs <span id='microPollutorMetalCost'>133000</span> Metal, <span id='microPollutorWoodCost'>189000</span> Wood, <span id='microPollutorLavaCost'>160000</span> Lava.
+									</span>
+									<br>
+									<br>
+									<button onclick="getMicroPollutor()" class="btn btn-default">Get Microverse Pollutor</button>
+									<button onclick="destroyMachine('microPollutor')" class="btn btn-default destroy hidden">Destroy Microverse Pollutor</button>
 								</td>
 							</tr>
 						</table>
@@ -1441,7 +1577,7 @@
 									<hide class="gainButton">
 									<br>
 									<br>
-									<div onclick="gainWood()" class="btn btn-default">Gain 1</div>
+									<div onclick="gainResource('wood')" class="btn btn-default">Gain <span id="woodGain">1</span></div>
 									</hide>
 									<br>
 									<br>
@@ -1455,7 +1591,7 @@
 									<span>
 										Upgrade your wood storage size to <span id="woodNextStorage">100</span>.
 										<br>
-										Time remaining until full storage: <b><span id="woodFullTime">N/A</span></b>
+										Time remaining until <span id="woodLimitType">full</span> storage: <b><span id="woodLimitTime">N/A</span></b>
 										<br>
 										Costs <span id="woodStorageCost">50</span> wood, <span id="woodStorageMetalCost">20</span> Metal.
 									</span>
@@ -1479,16 +1615,16 @@
 									<br>
 									<br>
 									<button onclick="getWoodcutter()" class="btn btn-default">Get Woodcutter</button>
-									<button onclick="destroyMachine(woodcutter, 'woodcutter')" class="btn btn-default destroy hidden">Destroy Woodcutter</button>
+									<button onclick="destroyMachine('woodcutter')" class="btn btn-default destroy hidden">Destroy Woodcutter</button>
 								</td>
 							</tr>
-							<tr id="woodMachine1" class="hidden">
+							<tr id="woodTier2" class="hidden">
 								<td>
 									<h3 class="default btn-link">
 										Laser Cutter: <span id="laserCutter">0</span>
 									</h3>
 									<span>
-										Laser Cutters slice trees (and fingers) quicker than axes and produce a lot more wood.
+										Laser Cutters slice trees (and fingers) more quickly than axes and produce a lot more wood.
 										<br>
 										Produces <span id="laserCutterOutput">6</span> wood per second.
 										<br>
@@ -1499,7 +1635,7 @@
 									<br>
 									<br>
 									<button onclick="getLaserCutter()" class="btn btn-default">Get Laser Cutter</button>
-									<button onclick="destroyMachine(laserCutter, 'laserCutter')" class="btn btn-default destroy hidden">Destroy Laser Cutter</button>
+									<button onclick="destroyMachine('laserCutter')" class="btn btn-default destroy hidden">Destroy Laser Cutter</button>
 								</td>
 							</tr>
 							<tr id="woodTier3" class="hidden">
@@ -1519,7 +1655,7 @@
 									<br>
 									<br>
 									<button onclick="getDeforester()" class="btn btn-default">Get Mass Deforester</button>
-									<button onclick="destroyMachine(deforester, 'deforester')" class="btn btn-default destroy hidden">Destroy Mass Deforester</button>
+									<button onclick="destroyMachine('deforester')" class="btn btn-default destroy hidden">Destroy Mass Deforester</button>
 								</td>
 							</tr>
 							<tr id="woodTier4" class="hidden">
@@ -1539,7 +1675,27 @@
 									<br>
 									<br>
 									<button onclick="getInfuser()" class="btn btn-default">Get Biomass Infuser</button>
-									<button onclick="destroyMachine(infuser, 'infuser')" class="btn btn-default destroy hidden">Destroy Biomass Infuser</button>
+									<button onclick="destroyMachine('infuser')" class="btn btn-default destroy hidden">Destroy Biomass Infuser</button>
+								</td>
+							</tr>
+							<tr id="woodTier5" class="hidden">
+								<td>
+									<h3 class="default btn-link">
+										Russian Forest: <span id="forest">0</span>
+									</h3>
+									<span>
+										The great Russian forests span thousands of miles. More than enough for at least your lifetime. Let the younger generation deal with running out.
+										<br>
+										Produces 3278 wood per second.
+										<br>
+										Uses 244 Energy per second.
+										<br>
+										Costs <span id='forestMetalCost'>122000</span> Metal, <span id='forestGemCost'>151000</span> Gems, <span id='forestHydrogenCost'>183000</span> Hydrogen.
+									</span>
+									<br>
+									<br>
+									<button onclick="getForest()" class="btn btn-default">Get Russian Forest</button>
+									<button onclick="destroyMachine('forest')" class="btn btn-default destroy hidden">Destroy Russian Forest</button>
 								</td>
 							</tr>
 						</table>
@@ -1559,7 +1715,7 @@
 									<hide class="gainButton">
 									<br>
 									<br>
-									<div onclick="gainSilicon()" class="btn btn-default">Gain 1</div>
+									<div onclick="gainResource('silicon')" class="btn btn-default">Gain <span id="siliconGain">1</span></div>
 									</hide>
 									<br>
 									<br>
@@ -1573,7 +1729,7 @@
 									<span>
 										Upgrade your Silicon storage size to <span id="siliconNextStorage">100</span>.
 										<br>
-										Time remaining until full storage: <b><span id="siliconFullTime">N/A</span></b>
+										Time remaining until <span id="siliconLimitType">full</span> storage: <b><span id="siliconLimitTime">N/A</span></b>
 										<br>
 										Costs <span id="siliconStorageCost">50</span> Silicon, <span id="siliconStorageLunariteCost">20</span> Lunarite.
 									</span>
@@ -1597,7 +1753,7 @@
 									<br>
 									<br>
 									<button onclick="getBlowtorch()" class="btn btn-default">Get Blowtorch</button>
-									<button onclick="destroyMachine(blowtorch, 'blowtorch')" class="btn btn-default destroy hidden">Destroy Empowered Blowtorch</button>
+									<button onclick="destroyMachine('blowtorch')" class="btn btn-default destroy hidden">Destroy Empowered Blowtorch</button>
 								</td>
 							</tr>
 							<tr>
@@ -1617,7 +1773,7 @@
 									<br>
 									<br>
 									<button onclick="getScorcher()" class="btn btn-default">Get Seaside Scorcher</button>
-									<button onclick="destroyMachine(scorcher, 'scorcher')" class="btn btn-default destroy hidden">Destroy Scorcher</button>
+									<button onclick="destroyMachine('scorcher')" class="btn btn-default destroy hidden">Destroy Scorcher</button>
 								</td>
 							</tr>
 							<tr id="siliconTier3" class="hidden">
@@ -1637,7 +1793,7 @@
 									<br>
 									<br>
 									<button onclick="getAnnihilator()" class="btn btn-default">Get Annihilator</button>
-									<button onclick="destroyMachine(annihilator, 'annihilator')" class="btn btn-default destroy hidden">Destroy Beach Annihilator</button>
+									<button onclick="destroyMachine('annihilator')" class="btn btn-default destroy hidden">Destroy Beach Annihilator</button>
 								</td>
 							</tr>
 							<tr id="siliconTier4" class="hidden">
@@ -1646,7 +1802,7 @@
 										Desert Destroyer: <span id="desert">0</span>
 									</h3>
 									<span>
-										This large ship orbits around the planet, focused in the Sahara Desert, tearing up sand from Earth and turning it into Silicon under intense heat.
+										This large ship orbits around the planet, focused on the Sahara Desert, tearing up sand from Earth and turning it into Silicon under intense heat.
 										<br>
 										Produces 157 silicon per second.
 										<br>
@@ -1657,7 +1813,27 @@
 									<br>
 									<br>
 									<button onclick="getDesert()" class="btn btn-default">Get Desert Destroyer</button>
-									<button onclick="destroyMachine(desert, 'desert')" class="btn btn-default destroy hidden">Destroy Desert Destroyer</button>
+									<button onclick="destroyMachine('desert')" class="btn btn-default destroy hidden">Destroy Desert Destroyer</button>
+								</td>
+							</tr>
+							<tr id="siliconTier5" class="hidden">
+								<td>
+									<h3 class="default btn-link">
+										Time And Relative Dimensions In Sand: <span id="tardis">0</span>
+									</h3>
+									<span>
+										The TARDIS, for short, harnesses the power of stars from far away in space-time to heat sand into Silicon at record speeds. 
+										<br>
+										Produces 1487 silicon per second.
+										<br>
+										Uses 746 Energy per second.
+										<br>
+										Costs <span id='tardisTitaniumCost'>204000</span> Titanium, <span id='tardisSiliconCost'>205000</span> Silicon, <span id='tardisMeteoriteCost'>17800</span> Meterorite.
+									</span>
+									<br>
+									<br>
+									<button onclick="getTardis()" class="btn btn-default">Get T.A.R.D.I.S.</button>
+									<button onclick="destroyMachine('tardis')" class="btn btn-default destroy hidden">Destroy T.A.R.D.I.S.</button>
 								</td>
 							</tr>
 						</table>
@@ -1677,7 +1853,7 @@
 									<hide class="gainButton">
 									<br>
 									<br>
-									<div onclick="gainLunarite()" class="btn btn-default">Gain 1</div>
+									<div onclick="gainResource('lunarite')" class="btn btn-default">Gain <span id="lunariteGain">1</span></div>
 									</hide>
 									<br>
 									<br>
@@ -1691,7 +1867,7 @@
 									<span>
 										Upgrade your Lunarite storage size to <span id="lunariteNextStorage">100</span>.
 										<br>
-										Time remaining until full storage: <b><span id="lunariteFullTime">N/A</span></b>
+										Time remaining until <span id="lunariteLimitType">full</span> storage: <b><span id="lunariteLimitTime">N/A</span></b>
 										<br>
 										Costs <span id="lunariteStorageCost">50</span> Lunarite, <span id="lunariteStorageMetalCost">200</span> Metal.
 									</span>
@@ -1715,7 +1891,7 @@
 									<br>
 									<br>
 									<button onclick="getMoonWorker()" class="btn btn-default">Get Moon Worker</button>
-									<button onclick="destroyMachine(moonWorker, 'moonWorker')" class="btn btn-default destroy hidden">Fire Moon Worker</button>
+									<button onclick="destroyMachine('moonWorker')" class="btn btn-default destroy hidden">Fire Moon Worker</button>
 								</td>
 							</tr>
 							<tr>
@@ -1735,7 +1911,7 @@
 									<br>
 									<br>
 									<button onclick="getMoonDrill()" class="btn btn-default">Get Low-Gravity Drill</button>
-									<button onclick="destroyMachine(moonDrill, 'moonDrill')" class="btn btn-default destroy hidden">Destroy Low-Gravity Drill</button>
+									<button onclick="destroyMachine('moonDrill')" class="btn btn-default destroy hidden">Destroy Low-Gravity Drill</button>
 								</td>
 							</tr>
 							<tr id="lunariteTier3" class="hidden">
@@ -1755,7 +1931,7 @@
 									<br>
 									<br>
 									<button onclick="getMoonQuarry()" class="btn btn-default">Get Moon Quarry</button>
-									<button onclick="destroyMachine(moonQuarry, 'moonQuarry')" class="btn btn-default destroy hidden">Destroy Moon Quarry</button>
+									<button onclick="destroyMachine('moonQuarry')" class="btn btn-default destroy hidden">Destroy Moon Quarry</button>
 								</td>
 							</tr>
 							<tr id="lunariteTier4" class="hidden">
@@ -1775,7 +1951,27 @@
 									<br>
 									<br>
 									<button onclick="getPlanetExcavator()" class="btn btn-default">Get Planetary Excavator</button>
-									<button onclick="destroyMachine(planetExcavator, 'planetExcavator')" class="btn btn-default destroy hidden">Destroy Planetary Excavator</button>
+									<button onclick="destroyMachine('planetExcavator')" class="btn btn-default destroy hidden">Destroy Planetary Excavator</button>
+								</td>
+							</tr>
+							<tr id="lunariteTier5" class="hidden">
+								<td>
+									<h3 class="default btn-link">
+										Moon Cloner: <span id="cloner">0</span>
+									</h3>
+									<span>
+										And you wondered why we have a hundred moons in the sky?
+										<br>
+										Produces 2122 Lunarite per second.
+										<br>
+										Uses 1216 Energy per second.
+										<br>
+										Costs <span id='clonerTitaniumCost'>204000</span> Titanium, <span id='clonerGoldCost'>150000</span> Gold, <span id='clonerMethaneCost'>195000</span> Methane.
+									</span>
+									<br>
+									<br>
+									<button onclick="getCloner()" class="btn btn-default">Get Moon Cloner</button>
+									<button onclick="destroyMachine('cloner')" class="btn btn-default destroy hidden">Destroy Moon Cloner</button>
 								</td>
 							</tr>
 						</table>
@@ -1795,7 +1991,7 @@
 									<hide class="gainButton">
 									<br>
 									<br>
-									<div onclick="gainMethane()" class="btn btn-default">Gain 1</div>
+									<div onclick="gainResource('methane')" class="btn btn-default">Gain <span id="methaneGain">1</span></div>
 									</hide>
 									<br>
 									<br>
@@ -1809,7 +2005,7 @@
 									<span>
 										Upgrade your methane storage size to <span id="methaneNextStorage">100</span>.
 										<br>
-										Time remaining until full storage: <b><span id="methaneFullTime">N/A</span></b>
+										Time remaining until <span id="methaneLimitType">full</span> storage: <b><span id="methaneLimitTime">N/A</span></b>
 										<br>
 										Costs <span id="methaneStorageCost">50</span> Methane, <span id="methaneStorageLunariteCost">20</span> Lunarite.
 									</span>
@@ -1833,7 +2029,7 @@
 									<br>
 									<br>
 									<button onclick="getVacuum()" class="btn btn-default">Get Vacuum Cleaner</button>
-									<button onclick="destroyMachine(vacuum, 'vacuum')" class="btn btn-default destroy hidden">Destroy Vacuum Cleaner</button>
+									<button onclick="destroyMachine('vacuum')" class="btn btn-default destroy hidden">Destroy Vacuum Cleaner</button>
 								</td>
 							</tr>
 							<tr>
@@ -1853,7 +2049,7 @@
 									<br>
 									<br>
 									<button onclick="getSuctionExcavator()" class="btn btn-default">Get Suction Excavator</button>
-									<button onclick="destroyMachine(suctionExcavator, 'suctionExcavator')" class="btn btn-default destroy hidden">Destroy Suction Excavator</button>
+									<button onclick="destroyMachine('suctionExcavator')" class="btn btn-default destroy hidden">Destroy Suction Excavator</button>
 								</td>
 							</tr>
 							<tr id="methaneTier3" class="hidden">
@@ -1862,7 +2058,7 @@
 										Space Cow Plantation: <span id="spaceCow">0</span>
 									</h3>
 									<span>
-										These hold cows genetically modified to produce methane constantly.
+										These hold cows genetically moodified to produce methane constantly.
 										<br>
 										Produces 37 methane per second.
 										<br>
@@ -1873,7 +2069,7 @@
 									<br>
 									<br>
 									<button onclick="getSpaceCow()" class="btn btn-default">Get Space Cow</button>
-									<button onclick="destroyMachine(spaceCow, 'spaceCow')" class="btn btn-default destroy hidden">Destroy Space Cow</button>
+									<button onclick="destroyMachine('spaceCow')" class="btn btn-default destroy hidden">Destroy Space Cow</button>
 								</td>
 							</tr>
 							<tr id="methaneTier4" class="hidden">
@@ -1893,10 +2089,29 @@
 									<br>
 									<br>
 									<button onclick="getVent()" class="btn btn-default">Get Hydrothermal Vent</button>
-									<button onclick="destroyMachine(vent, 'vent')" class="btn btn-default destroy hidden">Destroy Hydrothermal Vent</button>
+									<button onclick="destroyMachine('vent')" class="btn btn-default destroy hidden">Destroy Hydrothermal Vent</button>
 								</td>
 							</tr>
-
+							<tr id="methaneTier5" class="hidden">
+								<td>
+									<h3 class="default btn-link">
+										Interstellar Cow: <span id="interCow">0</span>
+									</h3>
+									<span>
+										An interdimoonsional bovine.
+										<br>
+										Produces 1393 methane per second.
+										<br>
+										Uses 899 Energy per second.
+										<br>
+										Costs <span id='interCowLunariteCost'>140000</span> Lunarite, <span id='interCowGoldCost'>202000</span> Gold, <span id='interCowHydrogenCost'>158000</span> Hydrogen.
+									</span>
+									<br>
+									<br>
+									<button onclick="getInterCow()" class="btn btn-default">Get Interstellar Cow</button>
+									<button onclick="destroyMachine('interCow')" class="btn btn-default destroy hidden">Destroy Interstellar Cow</button>
+								</td>
+							</tr>
 						</table>
 					</div>
 				</div>
@@ -1914,7 +2129,7 @@
 									<hide class="gainButton">
 									<br>
 									<br>
-									<div onclick="gainTitanium()" class="btn btn-default">Gain 1</div>
+									<div onclick="gainResource('titanium')" class="btn btn-default">Gain <span id="titaniumGain">1</span></div>
 									</hide>
 									<br>
 									<br>
@@ -1928,7 +2143,7 @@
 									<span>
 										Upgrade your Titanium storage size to <span id="titaniumNextStorage">100</span>.
 										<br>
-										Time remaining until full storage: <b><span id="titaniumFullTime">N/A</span></b>
+										Time remaining until <span id="titaniumLimitType">full</span> storage: <b><span id="titaniumLimitTime">N/A</span></b>
 										<br>
 										Costs <span id="titaniumStorageCost">50</span> Titanium, <span id="titaniumStorageLunariteCost">20</span> Lunarite.
 									</span>
@@ -1952,7 +2167,7 @@
 									<br>
 									<br>
 									<button onclick="getExplorer()" class="btn btn-default">Get Explorer</button>
-									<button onclick="destroyMachine(explorer, 'explorer')" class="btn btn-default destroy hidden">Destroy Explorer</button>
+									<button onclick="destroyMachine('explorer')" class="btn btn-default destroy hidden">Destroy Explorer</button>
 								</td>
 							</tr>
 							<tr>
@@ -1972,7 +2187,7 @@
 									<br>
 									<br>
 									<button onclick="getLunariteDrill()" class="btn btn-default">Get Lunarite Drill</button>
-									<button onclick="destroyMachine(lunariteDrill, 'lunariteDrill')" class="btn btn-default destroy hidden">Destroy Lunarite Drill</button>
+									<button onclick="destroyMachine('lunariteDrill')" class="btn btn-default destroy hidden">Destroy Lunarite Drill</button>
 								</td>
 							</tr>
 							<tr id="titaniumTier3" class="hidden">
@@ -1992,7 +2207,7 @@
 									<br>
 									<br>
 									<button onclick="getPentaDrill()" class="btn btn-default">Get Penta-Drill</button>
-									<button onclick="destroyMachine(pentaDrill, 'pentaDrill')" class="btn btn-default destroy hidden">Destroy Penta-Drill</button>
+									<button onclick="destroyMachine('pentaDrill')" class="btn btn-default destroy hidden">Destroy Penta-Drill</button>
 								</td>
 							</tr>
 							<tr id="titaniumTier4" class="hidden">
@@ -2001,7 +2216,7 @@
 										Drill of Titans: <span id="titanDrill">0</span>
 									</h3>
 									<span>
-										This mighty drill is said to have been wielded by Titans themselves, many milennia ago.
+										This mighty drill is said to have been wielded by Titans themselves, many millennia ago.
 										<br>
 										Produces 197 Titanium per second.
 										<br>
@@ -2012,7 +2227,27 @@
 									<br>
 									<br>
 									<button onclick="getTitanDrill()" class="btn btn-default">Get Titan-Drill</button>
-									<button onclick="destroyMachine(titanDrill, 'titanDrill')" class="btn btn-default destroy hidden">Destroy Titan-Drill</button>
+									<button onclick="destroyMachine('titanDrill')" class="btn btn-default destroy hidden">Destroy Titan-Drill</button>
+								</td>
+							</tr>
+							<tr id="titaniumTier5" class="hidden">
+								<td>
+									<h3 class="default btn-link">
+										David Guetta's Club: <span id="club">0</span>
+									</h3>
+									<span>
+										You shoot me down, but I won't fall. I am Titanium.
+										<br>
+										Produces 2106 Titanium per second.
+										<br>
+										Uses 690 Energy per second.
+										<br>
+										Costs <span id='clubUraniumCost'>175000</span> Uranium, <span id='clubWoodCost'>164000</span> Wood, <span id='clubHeliumCost'>156000</span> Helium.
+									</span>
+									<br>
+									<br>
+									<button onclick="getClub()" class="btn btn-default">Get Club</button>
+									<button onclick="destroyMachine('club')" class="btn btn-default destroy hidden">Destroy Club</button>
 								</td>
 							</tr>
 						</table>
@@ -2032,7 +2267,7 @@
 									<hide class="gainButton">
 									<br>
 									<br>
-									<div onclick="gainGold()" class="btn btn-default">Gain 1</div>
+									<div onclick="gainResource('gold')" class="btn btn-default">Gain <span id="goldGain">1</span></div>
 									</hide>
 									<br>
 									<br>
@@ -2046,7 +2281,7 @@
 									<span>
 										Upgrade your Gold storage size to <span id="goldNextStorage">100</span>.
 										<br>
-										Time remaining until full storage: <b><span id="goldFullTime">N/A</span></b>
+										Time remaining until <span id="goldLimitType">full</span> storage: <b><span id="goldLimitTime">N/A</span></b>
 										<br>
 										Costs <span id="goldStorageCost">50</span> Gold, <span id="goldStorageLunariteCost">20</span> Lunarite.
 									</span>
@@ -2070,7 +2305,7 @@
 									<br>
 									<br>
 									<button onclick="getDroid()" class="btn btn-default">Get Rocket Droid</button>
-									<button onclick="destroyMachine(droid, 'droid')" class="btn btn-default destroy hidden">Destroy Droid</button>
+									<button onclick="destroyMachine('droid')" class="btn btn-default destroy hidden">Destroy Droid</button>
 								</td>
 							</tr>
 							<tr>
@@ -2090,7 +2325,7 @@
 									<br>
 									<br>
 									<button onclick="getDestroyer()" class="btn btn-default">Get Asteroid Destroyer</button>
-									<button onclick="destroyMachine(destroyer, 'destroyer')" class="btn btn-default destroy hidden">Destroy Destroyer</button>
+									<button onclick="destroyMachine('destroyer')" class="btn btn-default destroy hidden">Destroy Destroyer</button>
 								</td>
 							</tr>
 							<tr id="goldTier3" class="hidden">
@@ -2110,7 +2345,7 @@
 									<br>
 									<br>
 									<button onclick="getDeathStar()" class="btn btn-default">Get Death Star Jr</button>
-									<button onclick="destroyMachine(deathStar, 'deathStar')" class="btn btn-default destroy hidden">Destroy Death Star Jr</button>
+									<button onclick="destroyMachine('deathStar')" class="btn btn-default destroy hidden">Destroy Death Star Jr</button>
 								</td>
 							</tr>
 							<tr id="goldTier4" class="hidden">
@@ -2130,7 +2365,27 @@
 									<br>
 									<br>
 									<button onclick="getActuator()" class="btn btn-default">Get Chronal Actuator</button>
-									<button onclick="destroyMachine(actuator, 'actuator')" class="btn btn-default destroy hidden">Destroy Chronal Actuator</button>
+									<button onclick="destroyMachine('actuator')" class="btn btn-default destroy hidden">Destroy Chronal Actuator</button>
+								</td>
+							</tr>
+							<tr id="goldTier5" class="hidden">
+								<td>
+									<h3 class="default btn-link">
+										Philosopher's Stone: <span id="philosopher">0</span>
+									</h3>
+									<span>
+										Transmuation has progressed to being able to turn thin air into gold!
+										<br>
+										Produces 2422 Gold per second.
+										<br>
+										Uses 1324 Energy per second.
+										<br>
+										Costs <span id='philosopherMetalCost'>208000</span> Metal, <span id='philosopherSilverCost'>167000</span> Silver, <span id='philosopherMeteoriteCost'>18000</span> Meterorite.
+									</span>
+									<br>
+									<br>
+									<button onclick="getPhilosopher()" class="btn btn-default">Get Philosopher's Stone</button>
+									<button onclick="destroyMachine('philosopher')" class="btn btn-default destroy hidden">Destroy Philosopher's Stone</button>
 								</td>
 							</tr>
 						</table>
@@ -2150,7 +2405,7 @@
 									<hide class="gainButton">
 									<br>
 									<br>
-									<div onclick="gainSilver()" class="btn btn-default">Gain 1</div>
+									<div onclick="gainResource('silver')" class="btn btn-default">Gain <span id="silverGain">1</span></div>
 									</hide>
 									<br>
 									<br>
@@ -2164,7 +2419,7 @@
 									<span>
 										Upgrade your silver storage size to <span id="silverNextStorage">100</span>.
 										<br>
-										Time remaining until full storage: <b><span id="silverFullTime">N/A</span></b>
+										Time remaining until <span id="silverLimitType">full</span> storage: <b><span id="silverLimitTime">N/A</span></b>
 										<br>
 										Costs <span id="silverStorageCost">50</span> Silver, <span id="silverStorageLunariteCost">20</span> Lunarite.
 									</span>
@@ -2188,7 +2443,7 @@
 									<br>
 									<br>
 									<button onclick="getScout()" class="btn btn-default">Get Scout Ship</button>
-									<button onclick="destroyMachine(scout, 'scout')" class="btn btn-default destroy hidden">Destroy Scout</button>
+									<button onclick="destroyMachine('scout')" class="btn btn-default destroy hidden">Destroy Scout</button>
 								</td>
 							</tr>
 							<tr>
@@ -2208,7 +2463,7 @@
 									<br>
 									<br>
 									<button onclick="getSpaceLaser()" class="btn btn-default">Get Interplanetary Laser</button>
-									<button onclick="destroyMachine(spaceLaser, 'spaceLaser')" class="btn btn-default destroy hidden">Destroy Space Laser</button>
+									<button onclick="destroyMachine('spaceLaser')" class="btn btn-default destroy hidden">Destroy Space Laser</button>
 								</td>
 							</tr>
 							<tr id="silverTier3" class="hidden">
@@ -2217,7 +2472,7 @@
 										Big Bertha: <span id="bertha">0</span>
 									</h3>
 									<span>
-										This large, space drill, named after the World War One Howitzer built almost a milienia ago, is a silver seeking machine specially designed for mining asteroids.
+										This large, space drill, named after the World War One Howitzer built almost a millennia ago, is a silver seeking machine specially designed for mining asteroids.
 										<br>
 										Produces 53 silver per second.
 										<br>
@@ -2228,7 +2483,7 @@
 									<br>
 									<br>
 									<button onclick="getBertha()" class="btn btn-default">Get Big Bertha</button>
-									<button onclick="destroyMachine(bertha, 'bertha')" class="btn btn-default destroy hidden">Destroy Big Bertha</button>
+									<button onclick="destroyMachine('bertha')" class="btn btn-default destroy hidden">Destroy Big Bertha</button>
 								</td>
 							</tr>
 							<tr id="silverTier4" class="hidden">
@@ -2248,7 +2503,26 @@
 									<br>
 									<br>
 									<button onclick="getCannon()" class="btn btn-default">Get Atomic Cannon</button>
-									<button onclick="destroyMachine(cannon, 'cannon')" class="btn btn-default destroy hidden">Destroy Atomic Cannon</button>
+									<button onclick="destroyMachine('cannon')" class="btn btn-default destroy hidden">Destroy Atomic Cannon</button>
+								</td>
+							</tr>
+							<tr id="silverTier5" class="hidden">
+								<td>
+									<h3 class="default btn-link">
+										Dead Werewolf Finder: <span id="werewolf">0</span>
+									</h3>
+									<span>
+										The Silver bullets used to kill werewolfs are made from silver that has been compressed well over 1000 times. Extracting them will prove beneficial for your production.
+										<br>
+										Produces 2261 silver per second.
+										<br>
+										Uses 1008 Energy per second.
+										<br>
+										Costs <span id='werewolfUraniumCost'>165000</span> Uranium, <span id='werewolfGemCost'>209000</span> Gems, <span id='werewolfMethaneCost'>170000</span> Methane.
+									<br>
+									<br>
+									<button onclick="getWerewolf()" class="btn btn-default">Get Dead Werewolf Finder</button>
+									<button onclick="destroyMachine('werewolf')" class="btn btn-default destroy hidden">Destroy Dead Werewolf Finder</button>
 								</td>
 							</tr>
 						</table>
@@ -2268,7 +2542,7 @@
 									<hide class="gainButton">
 									<br>
 									<br>
-									<div onclick="gainLava()" class="btn btn-default">Gain 1</div>
+									<div onclick="gainResource('lava')" class="btn btn-default">Gain <span id="lavaGain">1</span></div>
 									</hide>
 									<br>
 									<br>
@@ -2282,7 +2556,7 @@
 									<span>
 										Upgrade your Lava storage size to <span id="lavaNextStorage">100</span>.
 										<br>
-										Time remaining until full storage: <b><span id="lavaFullTime">N/A</span></b>
+										Time remaining until <span id="lavaLimitType">full</span> storage: <b><span id="lavaLimitTime">N/A</span></b>
 										<br>
 										Costs <span id="lavaStorageCost">50</span> Lava, <span id="lavaStorageLunariteCost">20</span> Lunarite.
 									</span>
@@ -2306,7 +2580,7 @@
 									<br>
 									<br>
 									<button onclick="getCrucible()" class="btn btn-default">Get Crucible</button>
-									<button onclick="destroyMachine(crucible, 'crucible')" class="btn btn-default destroy hidden">Destroy Heat Resistant Crucible</button>
+									<button onclick="destroyMachine('crucible')" class="btn btn-default destroy hidden">Destroy Heat Resistant Crucible</button>
 								</td>
 							</tr>
 							<tr>
@@ -2326,7 +2600,7 @@
 									<br>
 									<br>
 									<button onclick="getExtractor()" class="btn btn-default">Get Extractor</button>
-									<button onclick="destroyMachine(extractor, 'extractor')" class="btn btn-default destroy hidden">Destroy Lava Extractor</button>
+									<button onclick="destroyMachine('extractor')" class="btn btn-default destroy hidden">Destroy Lava Extractor</button>
 								</td>
 							</tr>
 							<tr id="lavaTier3" class="hidden">
@@ -2346,7 +2620,7 @@
 									<br>
 									<br>
 									<button onclick="getExtruder()" class="btn btn-default">Get Igneous Extruder</button>
-									<button onclick="destroyMachine(extruder, 'extruder')" class="btn btn-default destroy hidden">Destroy Igneous Extruder</button>
+									<button onclick="destroyMachine('extruder')" class="btn btn-default destroy hidden">Destroy Igneous Extruder</button>
 								</td>
 							</tr>
 							<tr id="lavaTier4" class="hidden">
@@ -2366,7 +2640,27 @@
 									<br>
 									<br>
 									<button onclick="getVeluptuator()" class="btn btn-default">Get Volcanic Veluptuator</button>
-									<button onclick="destroyMachine(veluptuator, 'veluptuator')" class="btn btn-default destroy hidden">Destroy Volcanic Veluptuator</button>
+									<button onclick="destroyMachine('veluptuator')" class="btn btn-default destroy hidden">Destroy Volcanic Veluptuator</button>
+								</td>
+							</tr>
+							<tr id="lavaTier5" class="hidden">
+								<td>
+									<h3 class="default btn-link">
+										Jupitonian Condensator: <span id="condensator">0</span>
+									</h3>
+									<span>
+										Condense gases from the heart of Jupiter into liquid magma.
+										<br>
+										Produces 2103 Lava per second.
+										<br>
+										Uses 4142 Energy per second.
+										<br>
+										Costs <span id='condensatorLunariteCost'>288000</span> Lunarite, <span id='condensatorGemCost'>210000</span> Gems, <span id='condensatorIceCost'>238000</span> Ice.
+									</span>
+									<br>
+									<br>
+									<button onclick="getCondensator()" class="btn btn-default">Get Jupitonian Condensator</button>
+									<button onclick="destroyMachine('condensator')" class="btn btn-default destroy hidden">Destroy Jupitonian Condensator</button>
 								</td>
 							</tr>
 						</table>
@@ -2386,7 +2680,7 @@
 									<hide class="gainButton">
 									<br>
 									<br>
-									<div onclick="gainHydrogen()" class="btn btn-default">Gain 1</div>
+									<div onclick="gainResource('hydrogen')" class="btn btn-default">Gain <span id="hydrogenGain">1</span></div>
 									</hide>
 									<br>
 									<br>
@@ -2400,7 +2694,7 @@
 									<span>
 										Upgrade your Hydrogen storage size to <span id="hydrogenNextStorage">100</span>.
 										<br>
-										Time remaining until full storage: <b><span id="hydrogenFullTime">N/A</span></b>
+										Time remaining until <span id="hydrogenLimitType">full</span> storage: <b><span id="hydrogenLimitTime">N/A</span></b>
 										<br>
 										Costs <span id="hydrogenStorageCost">50</span> Hydrogen, <span id="hydrogenStorageLunariteCost">20</span> Lunarite.
 									</span>
@@ -2424,7 +2718,7 @@
 									<br>
 									<br>
 									<button onclick="getCollector()" class="btn btn-default">Get Collector</button>
-									<button onclick="destroyMachine(collector, 'collector')" class="btn btn-default destroy hidden">Destroy Collector</button>
+									<button onclick="destroyMachine('collector')" class="btn btn-default destroy hidden">Destroy Collector</button>
 								</td>
 							</tr>
 							<tr>
@@ -2444,7 +2738,7 @@
 									<br>
 									<br>
 									<button onclick="getMagnet()" class="btn btn-default">Get Magnet</button>
-									<button onclick="destroyMachine(magnet, 'magnet')" class="btn btn-default destroy hidden">Destroy Gaseous Magnet</button>
+									<button onclick="destroyMachine('magnet')" class="btn btn-default destroy hidden">Destroy Gaseous Magnet</button>
 								</td>
 							</tr>
 							<tr id="hydrogenTier3" class="hidden">
@@ -2464,7 +2758,7 @@
 									<br>
 									<br>
 									<button onclick="getECell()" class="btn btn-default">Get Electrolytic Cell</button>
-									<button onclick="destroyMachine(eCell, 'eCell')" class="btn btn-default destroy hidden">Destroy Electrolytic Cell</button>
+									<button onclick="destroyMachine('eCell')" class="btn btn-default destroy hidden">Destroy Electrolytic Cell</button>
 								</td>
 							</tr>
 							<tr id="hydrogenTier4" class="hidden">
@@ -2484,7 +2778,27 @@
 									<br>
 									<br>
 									<button onclick="getHindenburg()" class="btn btn-default">Get Hindenburg Excavation</button>
-									<button onclick="destroyMachine(hindenburg, 'hindenburg')" class="btn btn-default destroy hidden">Destroy Hindenburg Excavation</button>
+									<button onclick="destroyMachine('hindenburg')" class="btn btn-default destroy hidden">Destroy Hindenburg Excavation</button>
+								</td>
+							</tr>
+							<tr id="hydrogenTier5" class="hidden">
+								<td>
+									<h3 class="default btn-link">
+										Star Harvester: <span id="harvester">0</span>
+									</h3>
+									<span>
+										'Stealing' is such a strong word. I prefer 'borrowing without return' when we harvest the outer regions of stars.
+										<br>
+										Produces 3562 Hydrogen per second.
+										<br>
+										Uses 3562 Energy per second.
+										<br>
+										Costs <span id='harvesterLunariteCost'>250000</span> Lunarite, <span id='harvesterWoodCost'>184000</span> Wood, <span id='harvesterOilCost'>146000</span> Oil.
+									</span>
+									<br>
+									<br>
+									<button onclick="getHarvester()" class="btn btn-default">Get Star Harvester</button>
+									<button onclick="destroyMachine('harvester')" class="btn btn-default destroy hidden">Destroy Star Harvester</button>
 								</td>
 							</tr>
 						</table>
@@ -2504,7 +2818,7 @@
 									<hide class="gainButton">
 									<br>
 									<br>
-									<div onclick="gainHelium()" class="btn btn-default">Gain 1</div>
+									<div onclick="gainResource('helium')" class="btn btn-default">Gain <span id="heliumGain">1</span></div>
 									</hide>
 									<br>
 									<br>
@@ -2518,7 +2832,7 @@
 									<span>
 										Upgrade your Helium storage size to <span id="heliumNextStorage">100</span>.
 										<br>
-										Time remaining until full storage: <b><span id="heliumFullTime">N/A</span></b>
+										Time remaining until <span id="heliumLimitType">full</span> storage: <b><span id="heliumLimitTime">N/A</span></b>
 										<br>
 										Costs <span id="heliumStorageCost">50</span> Helium, <span id="heliumStorageLunariteCost">20</span> Lunarite.
 									</span>
@@ -2542,7 +2856,7 @@
 									<br>
 									<br>
 									<button onclick="getDrone()" class="btn btn-default">Get Drone</button>
-									<button onclick="destroyMachine(drone, 'drone')" class="btn btn-default destroy hidden">Destroy Helium Drone</button>
+									<button onclick="destroyMachine('drone')" class="btn btn-default destroy hidden">Destroy Helium Drone</button>
 								</td>
 							</tr>
 							<tr>
@@ -2562,7 +2876,7 @@
 									<br>
 									<br>
 									<button onclick="getTanker()" class="btn btn-default">Get Tanker</button>
-									<button onclick="destroyMachine(tanker, 'tanker')" class="btn btn-default destroy hidden">Destroy Helium Tanker</button>
+									<button onclick="destroyMachine('tanker')" class="btn btn-default destroy hidden">Destroy Helium Tanker</button>
 								</td>
 							</tr>
 							<tr id="heliumTier3" class="hidden">
@@ -2582,7 +2896,7 @@
 									<br>
 									<br>
 									<button onclick="getCompressor()" class="btn btn-default">Get Morphic Compressor</button>
-									<button onclick="destroyMachine(compressor, 'compressor')" class="btn btn-default destroy hidden">Destroy Morphic Compressor</button>
+									<button onclick="destroyMachine('compressor')" class="btn btn-default destroy hidden">Destroy Morphic Compressor</button>
 								</td>
 							</tr>
 							<tr id="heliumTier4" class="hidden">
@@ -2602,7 +2916,27 @@
 									<br>
 									<br>
 									<button onclick="getSkimmer()" class="btn btn-default">Get Gas Giant Skimmer</button>
-									<button onclick="destroyMachine(skimmer, 'skimmer')" class="btn btn-default destroy hidden">Destroy Gas Giant Skimmer</button>
+									<button onclick="destroyMachine('skimmer')" class="btn btn-default destroy hidden">Destroy Gas Giant Skimmer</button>
+								</td>
+							</tr>
+							<tr id="heliumTier5" class="hidden">
+								<td>
+									<h3 class="default btn-link">
+										Caged Star: <span id="cage">0</span>
+									</h3>
+									<span>
+										A contained miniature version of the sun uses nuclear fusion to create massive amounts of helium.
+										<br>
+										Produces 2369 Helium per second.
+										<br>
+										Uses 4075 Energy per second.
+										<br>
+										Costs <span id='cageLunariteCost'>171000</span> Lunarite, <span id='cageSiliconCost'>165000</span> Silicon, <span id='cageMeteoriteCost'>18600</span> Meterorite.
+									</span>
+									<br>
+									<br>
+									<button onclick="getCage()" class="btn btn-default">Get Caged Star</button>
+									<button onclick="destroyMachine('cage')" class="btn btn-default destroy hidden">Destroy Caged Star</button>
 								</td>
 							</tr>
 						</table>
@@ -2622,7 +2956,7 @@
 									<hide class="gainButton">
 									<br>
 									<br>
-									<div onclick="gainIce()" class="btn btn-default">Gain 1</div>
+									<div onclick="gainResource('ice')" class="btn btn-default">Gain <span id="iceGain">1</span></div>
 									</hide>
 									<br>
 									<br>
@@ -2636,7 +2970,7 @@
 									<span>
 										Upgrade your Ice storage size to <span id="iceNextStorage">100</span>.
 										<br>
-										Time remaining until full storage: <b><span id="iceFullTime">N/A</span></b>
+										Time remaining until <span id="iceLimitType">full</span> storage: <b><span id="iceLimitTime">N/A</span></b>
 										<br>
 										Costs <span id="iceStorageCost">50</span> Ice, <span id="iceStorageLunariteCost">20</span> Lunarite.
 									</span>
@@ -2660,7 +2994,7 @@
 									<br>
 									<br>
 									<button onclick="getIcePick()" class="btn btn-default">Get Ice Pickaxe</button>
-									<button onclick="destroyMachine(icePick, 'icePick')" class="btn btn-default destroy hidden">Destroy Ice Pickaxe</button>
+									<button onclick="destroyMachine('icePick')" class="btn btn-default destroy hidden">Destroy Ice Pickaxe</button>
 								</td>
 							</tr>
 							<tr>
@@ -2680,7 +3014,7 @@
 									<br>
 									<br>
 									<button onclick="getIceDrill()" class="btn btn-default">Get Ice Drill</button>
-									<button onclick="destroyMachine(iceDrill, 'iceDrill')" class="btn btn-default destroy hidden">Destroy Ice Drill</button>
+									<button onclick="destroyMachine('iceDrill')" class="btn btn-default destroy hidden">Destroy Ice Drill</button>
 								</td>
 							</tr>
 							<tr id="iceTier3" class="hidden">
@@ -2700,7 +3034,7 @@
 									<br>
 									<br>
 									<button onclick="getFreezer()" class="btn btn-default">Get Freezer</button>
-									<button onclick="destroyMachine(freezer, 'freezer')" class="btn btn-default destroy hidden">Destroy Ocean Freezer</button>
+									<button onclick="destroyMachine('freezer')" class="btn btn-default destroy hidden">Destroy Ocean Freezer</button>
 								</td>
 							</tr>
 							<tr id="iceTier4" class="hidden">
@@ -2720,7 +3054,27 @@
 									<br>
 									<br>
 									<button onclick="getMrFreeze()" class="btn btn-default">Get Mr Freeze</button>
-									<button onclick="destroyMachine(mrFreeze, 'mrFreeze')" class="btn btn-default destroy hidden">Destroy Mr Freeze</button>
+									<button onclick="destroyMachine('mrFreeze')" class="btn btn-default destroy hidden">Destroy Mr Freeze</button>
+								</td>
+							</tr>
+							<tr id="iceTier5" class="hidden">
+								<td>
+									<h3 class="default btn-link">
+										Overexchange Condenser: <span id="overexchange">0</span>
+									</h3>
+									<span>
+										Drain heat out of the ingredients so fast that you're not sure how to process it safely, but you managed to do it properly anyway.
+										<br>
+										Produces 2973 Ice per second.
+										<br>
+										Uses 7397 Energy per second.
+										<br>
+										Costs <span id='overexchangeMetalCost'>210,000</span> Metal, <span id='overexchangeSilverCost'>188,000</span> Silver, <span id='overexchangeHeliumCost'>205,000</span> Helium.
+									</span>
+									<br>
+									<br>
+									<button onclick="getOverexchange()" class="btn btn-default">Get Overexchange Condenser</button>
+									<button onclick="destroyMachine('overexchange')" class="btn btn-default destroy hidden">Destroy Overexchange Condenser</button>
 								</td>
 							</tr>
 						</table>
@@ -2742,7 +3096,7 @@
 									<br>
 									<br>
 									<hide class="gainButton">
-									<div onclick="gainMeteorite()" class="btn btn-default">Convert 1</div>
+									<div onclick="gainResource('meteorite')" class="btn btn-default">Convert <span id="meteoriteGain">1</span></div>
 									</hide>
 									<button onclick="toggleMeteorite()" class="btn btn-default">Turn Meteorite Production <span id="meteoriteToggled">Off</span></button>
 									<br>
@@ -2757,7 +3111,7 @@
 									<span>
 										Upgrade your Meteorite storage size to <span id="meteoriteNextStorage">100</span>.
 										<br>
-										Time remaining until full storage: <b><span id="meteoriteFullTime">N/A</span></b>
+										Time remaining until <span id="meteoriteLimitType">full</span> storage: <b><span id="meteoriteLimitTime">N/A</span></b>
 										<br>
 										Costs <span id="meteoriteStorageCost">50</span> Meteorite, <span id="meteoriteStorageLunariteCost">400</span> Lunarite.
 									</span>
@@ -2781,7 +3135,7 @@
 									<br>
 									<br>
 									<button onclick="getPrinter()" class="btn btn-default">Get Meteorite Printer</button>
-									<button onclick="destroyMachine(printer, 'printer')" class="btn btn-default destroy hidden">Destroy Meteorite Printer</button>
+									<button onclick="destroyMachine('printer')" class="btn btn-default destroy hidden">Destroy Meteorite Printer</button>
 								</td>
 							</tr>
 							<tr id="meteoriteTier2" class="hidden">
@@ -2799,7 +3153,43 @@
 									<br>
 									<br>
 									<button onclick="getWeb()" class="btn btn-default">Get Meteorite Web</button>
-									<button onclick="destroyMachine(web, 'web')" class="btn btn-default destroy hidden">Destroy Meteorite Web</button>
+									<button onclick="destroyMachine('web')" class="btn btn-default destroy hidden">Destroy Meteorite Web</button>
+								</td>
+							</tr>
+							<tr id="meteoriteTier3" class="hidden">
+								<td>
+									<h3 class="default btn-link">
+										Planet Smasher: <span id="smasher">0</span>
+									</h3>
+									<span>
+										Get meteorites the old-fashioned way: demolishing uninhabited exoplanets by firing high-energy particle beams at them, then collect the debris.
+										<br>
+										Produces 72 Meteorite per second. Uses 111 Plasma per second.
+										<br>
+										Costs <span id="smasherSiliconCost">3.23M</span> Silicon, <span id="smasherSilverCost">5.89M</span> Silver, <span id="smasherGemCost">8.34M</span> Gems.
+									</span>
+									<br>
+									<br>
+									<button onclick="getSmasher()" class="btn btn-default">Get Planet Smasher</button>
+									<button onclick="destroyMachine('smasher')" class="btn btn-default destroy hidden">Destroy Planet Smasher</button>
+								</td>
+							</tr>
+							<tr id="meteoriteTier4" class="hidden">
+								<td>
+									<h3 class="default btn-link">
+										Nebulous Synthesizer: <span id="nebulous">0</span>
+									</h3>
+									<span>
+										Bypass the need for demolishing planets entirely by building your own nebula to create meteorites instead of planets.
+										<br>
+										Produces 135 Meteorite per second. Uses 142 Plasma per second.
+										<br>
+										Costs <span id="nebulousLunariteCost">25.8M</span> Lunarite, <span id="nebulousLavaCost">19.7M</span> Lava, <span id="nebulousGoldCost">21.9M</span> Gold.
+									</span>
+									<br>
+									<br>
+									<button onclick="getNebulous()" class="btn btn-default">Get Nebulous Synthesizer</button>
+									<button onclick="destroyMachine('nebulous')" class="btn btn-default destroy hidden">Destroy Nebulous Synthesizer</button>
 								</td>
 							</tr>
 						</table>
@@ -2932,12 +3322,29 @@
 									<button onclick="getLabT4()" class="btn btn-default">Build Laboratory T4</button>
 								</td>
 							</tr>
+							<tr id="labTier5" class="hidden">
+								<td>
+									<h3 class="default btn-link">
+										Space Scientific Satellite Station: <span id="labT5">0</span>
+									</h3>
+									<span>
+										From outside Earth's orbit, the universe can be understood much more efficiently without an atmosphere obstructing the lab's view.
+										<br>
+										Each one produces 1000 science per second.
+										<br>
+										Costs <span id="labT5MetalCost">12.40M</span> Metal, <span id="labT5GemCost">7.30M</span> Gems, <span id="labT5WoodCost">15.90M</span> Wood.
+									</span>
+									<br>
+									<br>
+									<button onclick="getLabT5()" class="btn btn-default">Build Laboratory T5</button>
+								</td>
+							</tr>
 						</table>
 					</div>
 				</div>
 				<div id="technologiesTab" class="tab-pane fade in" style="margin-left:10px; float:left;">
 					<div class="container" style="max-width:800px;">
-						<table class="table">
+						<table id="techTable" class="table">
 							<tr>
 								<td style="border: none;">
 									<h2 class="default btn-link">
@@ -2948,562 +3355,7 @@
 									</span>
 								</td>
 							</tr>
-							<tr id="unlockStorage">
-								<td>
-									<h3 class="default btn-link">
-										Storage Upgrades
-									</h3>
-									<span>
-										This will allow you to build storage upgrades to increase the maximum on the amount of resource you can have at once.
-										<br>
-										Costs <span id="unlockStorageCost">5</span> Science.
-									</span>
-									<br>
-									<br>
-									<button onclick="unlockStorage()" class="btn btn-default">Unlock Storage</button>
-									<br>
-									<br>
-								</td>
-							</tr>
-							<tr id="unlockBasicEnergy">
-								<td>
-									<h3 class="default btn-link">
-										Basic Energy Production
-									</h3>
-									<span>
-										You will be able to produce power from steam engines using Charcoal made from wood in a furnace.
-										<br>
-										Costs <span id="unlockBasicEnergyCost">20</span> Science.
-									</span>
-									<br>
-									<br>
-									<button onclick="unlockBasicEnergy()" class="btn btn-default">Unlock Basic Energy Production</button>
-									<br>
-									<br>
-								</td>
-							</tr>
-							<tr id="unlockOil" class="hidden">
-								<td>
-									<h3 class="default btn-link">
-										Oil Processing
-									</h3>
-									<span>
-										Oil used to fuel more advanced machines that gather resources and also to produce more power than basic means.
-										Unlocking Oil Processing allows you to extract it from the ground.
-										<br>
-										Costs <span id="unlockOilCost">30</span> Science.
-									</span>
-									<br>
-									<br>
-									<button onclick="unlockOil()" class="btn btn-default">Unlock Oil</button>
-									<br>
-									<br>
-								</td>
-							</tr>
-							<tr id="unlockSolar" class="hidden">
-								<td>
-									<h3 class="default btn-link">
-										Solar Panels
-									</h3>
-									<span>
-										Solar Panels produce Energy without the need for fuel, but they do it slower than other forms of Energy production.
-										<br>
-										Costs <span id="unlockSolarCost">50</span> Science.
-									</span>
-									<br>
-									<br>
-									<button onclick="unlockSolar()" class="btn btn-default">Unlock Solar Panels</button>
-									<br>
-									<br>
-								</td>
-							</tr>
-							<tr id="unlockMachines" class="hidden">
-								<td>
-									<h3 class="default btn-link">
-										Resource Machines
-									</h3>
-									<span>
-										Resource Machines produce more resources than simple methods but require a constant supply of power to work.
-										<br>
-										Costs <span id="unlockMachinesCost">100</span> Science.
-									</span>
-									<br>
-									<br>
-									<button onclick="unlockMachines()" class="btn btn-default">Unlock Resource Machines</button>
-									<br>
-									<br>
-								</td>
-							</tr>
-							<tr id="unlockDestruction" class="hidden">
-								<td>
-									<h3 class="default btn-link">
-										Destruction of Machines
-									</h3>
-									<span>
-										This allows you to destroy machines you have already created. It can be useful when there are more efficient methods of gaining resources, or if you don't have enough energy to support your machines.
-										<br>
-										Costs <span id="unlockDestructionCost">500</span> Science.
-									</span>
-									<br>
-									<br>
-									<button onclick="unlockDestruction()" class="btn btn-default">Unlock Destruction</button>
-									<br>
-									<br>
-								</td>
-							</tr>
-							<tr id="upgradeResourceTech" class="hidden">
-								<td>
-									<h3 class="default btn-link">
-										Upgrade Resource Technology
-									</h3>
-									<span>
-										Make your resource machines produce even more resources than before. This upgrade doubles the amount they produce for each unit of Energy.
-										<br>
-										Costs <span id="upgradeResourceTechCost">300</span> Science.
-									</span>
-									<br>
-									<br>
-									<button onclick="upgradeResourceTech()" class="btn btn-default">Upgrade Resource Tech</button>
-									<br>
-									<br>
-								</td>
-							</tr>
-							<tr id="unlockSolarSystem" class="hidden">
-								<td>
-									<h3 class="default btn-link">
-										Space
-									</h3>
-									<span>
-										Unlocking space-travel allows for launching of rockets and opens a whole new field of research.
-										<br>
-										Costs <span id="unlockSolarSystemCost">500</span> Science.
-									</span>
-									<br>
-									<br>
-									<button onclick="unlockSolarSystem()" class="btn btn-default">Unlock Space Travel</button>
-									<br>
-									<br>
-								</td>
-							</tr>
-							<tr id="unlockLabT2" class="hidden">
-								<td>
-									<h3 class="default btn-link">
-										Tier 2 Science
-									</h3>
-									<span>
-										Researching this will allow you to increase your science production drastically.
-										<br>
-										Costs <span id="unlockLabT2Cost">500</span> Science.
-									</span>
-									<br>
-									<br>
-									<button onclick="unlockLabT2()" class="btn btn-default">Unlock Tier 2 Science</button>
-									<br>
-									<br>
-								</td>
-							</tr>
-							<tr id="upgradeEngineTech" class="hidden">
-								<td>
-									<h3 class="default btn-link">
-										Upgrade Engine Technology
-									</h3>
-									<span>
-										Upgrading Engine Technology will make Charcoal engines produce 4 Energy per second instead of 2.
-										<br>
-										Costs <span id="upgradeEngineTechCost">1,000</span> Science.
-									</span>
-									<br>
-									<br>
-									<button onclick="upgradeEngineTech()" class="btn btn-default">Upgrade Engine Tech</button>
-									<br>
-									<br>
-								</td>
-							</tr>
-							<tr id="unlockRocketFuelT2" class="hidden">
-								<td>
-									<h3 class="default btn-link">
-										Oxidisation
-									</h3>
-									<span>
-										Oxidisation is a more efficient process of creating Rocket Fuel.
-										<br>
-										Costs <span id="unlockRocketFuelT2Cost">450,000</span> Science.
-									</span>
-									<br>
-									<br>
-									<button onclick="unlockRocketFuelT2()" class="btn btn-default">Unlock Oxidisation</button>
-									<br>
-									<br>
-								</td>
-							</tr>
-							<tr id="unlockRocketFuelT3" class="hidden">
-								<td>
-									<h3 class="default btn-link">
-										Hydrazine
-									</h3>
-									<span>
-										Hydrazine is a compound created by Methane that increases the speed at which rocket fuel can be produced in a Hydrazine Catalyst Machine.
-										<br>
-										Costs <span id="unlockRocketFuelT3Cost">3.200M</span> Science.
-									</span>
-									<br>
-									<br>
-									<button onclick="unlockRocketFuelT3()" class="btn btn-default">Unlock Hydrazine</button>
-									<br>
-									<br>
-								</td>
-							</tr>
-							<tr id="unlockLabT3" class="hidden">
-								<td>
-									<h3 class="default btn-link">
-										Tier 3 Science
-									</h3>
-									<span>
-										Researching this will allow you to access the third tier of science production, creating much more science than the previous tiers.
-										<br>
-										Costs <span id="unlockLabT3Cost">3,000</span> Science.
-									</span>
-									<br>
-									<br>
-									<button onclick="unlockLabT3()" class="btn btn-default">Unlock Tier 3 Science</button>
-									<br>
-									<br>
-								</td>
-							</tr>
-							<tr id="upgradeSolarTech" class="hidden">
-								<td>
-									<h3 class="default btn-link">
-										Upgrade Solar Technology
-									</h3>
-									<span>
-										Upgrading Solar Technology will make solar panels produce 3 Energy per second instead of 1.5.
-										<br>
-										Costs <span id="upgradeSolarTechCost">5,000</span> Science.
-									</span>
-									<br>
-									<br>
-									<button onclick="upgradeSolarTech()" class="btn btn-default">Upgrade Solar Tech</button>
-									<br>
-									<br>
-								</td>
-							</tr>
-							<tr id="unlockBatteries" class="hidden">
-								<td>
-									<h3 class="default btn-link">
-										Batteries
-									</h3>
-									<span>
-										Batteries improve the amount of energy you can store at once.
-										<br>
-										Costs <span id="unlockBatteriesCost">15,000</span> Science.
-									</span>
-									<br>
-									<br>
-									<button onclick="unlockBatteries()" class="btn btn-default">Unlock Batteries</button>
-									<br>
-									<br>
-								</td>
-							</tr>
-							<tr id="unlockPlasma" class="hidden">
-								<td>
-									<h3 class="default btn-link">
-										Plasma Technology
-									</h3>
-									<span>
-										This allows you to turn your energy and hydrogen into plasma.
-										<br>
-										Costs <span id="unlockPlasmaCost">40,000</span> Science.
-									</span>
-									<br>
-									<br>
-									<button onclick="unlockPlasma()" class="btn btn-default">Unlock Plasma</button>
-									<br>
-									<br>
-								</td>
-							</tr>
-							<tr id="unlockPSU" class="hidden">
-								<td>
-									<h3 class="default btn-link">
-										Plasma Storage Units
-									</h3>
-									<span>
-										PSUs increase the limit on plasma you can store at once.
-										<br>
-										Costs <span id="unlockPSUCost">9.500M</span> Science.
-									</span>
-									<br>
-									<br>
-									<button onclick="unlockPSU()" class="btn btn-default">Unlock PSUs</button>
-									<br>
-									<br>
-								</td>
-							</tr>
-							<tr id="unlockPSUT2" class="hidden">
-								<td>
-									<h3 class="default btn-link">
-										Tier 2 Plasma Storage Units
-									</h3>
-									<span>
-										Tier 2 PSUs are more efficient at storing plasma but they are significantly larger and require more resources to make.
-										<br>
-										Costs <span id="unlockPSUT2Cost">37.00M</span> Science.
-									</span>
-									<br>
-									<br>
-									<button onclick="unlockPSUT2()" class="btn btn-default">Unlock T2 PSUs</button>
-									<br>
-									<br>
-								</td>
-							</tr>
-							<tr id="unlockPlasmaTier2" class="hidden">
-								<td>
-									<h3 class="default btn-link">
-										Plasma Tier 2
-									</h3>
-									<span>
-										This research unlocks the second tier of Plasma production, the Plasmatic Pit.
-										<br>
-										Costs <span id="unlockPlasmaTier2Cost">60,000</span> Science.
-									</span>
-									<br>
-									<br>
-									<button onclick="unlockPlasmaTier2()" class="btn btn-default">Unlock Plasma Tier 2</button>
-									<br>
-									<br>
-								</td>
-							</tr>
-							<tr id="unlockLabT4" class="hidden">
-								<td>
-									<h3 class="default btn-link">
-										Tier 4 Science
-									</h3>
-									<span>
-										Researching this will allow you to access the fourth tier of science production, creating 10 times as much science as the previous tier.
-										<br>
-										Costs <span id="unlockLabT4Cost">50M</span> Science.
-									</span>
-									<br>
-									<br>
-									<button onclick="unlockLabT4()" class="btn btn-default">Unlock Tier 4 Science</button>
-									<br>
-									<br>
-								</td>
-							</tr>
-							<tr id="unlockEmc" class="hidden">
-								<td>
-									<h3 class="default btn-link">
-										Energy-Mass Conversion
-									</h3>
-									<span>
-										This power technology not only lets you create existing resources, but allows you to make new, and only creatable elements, such as meteorite.
-										<br>
-										Costs <span id="unlockEmcCost">60,000</span> Science.
-									</span>
-									<br>
-									<br>
-									<button onclick="unlockEmc()" class="btn btn-default">Unlock EMC</button>
-									<br>
-									<br>
-								</td>
-							</tr>
-							<tr id="unlockMeteorite" class="hidden">
-								<td>
-									<h3 class="default btn-link">
-										Meteorite
-									</h3>
-									<span>
-										Meteorite is one of the rare resources in the Galaxy as it is an artificial one. All of the pre-existing Meteorite that once was in the Kuiper Belt, and similar asteroid fields in other solar systems, has all been mined away. Now, the only way to get is to make it in machines from energy.
-										<br>
-										Costs <span id="unlockMeteoriteCost">100,000</span> Science.
-									</span>
-									<br>
-									<br>
-									<button onclick="unlockMeteorite()" class="btn btn-default">Unlock Meteorite</button>
-									<br>
-									<br>
-								</td>
-							</tr>
-							<tr id="unlockMeteoriteTier1" class="hidden">
-								<td>
-									<h3 class="default btn-link">
-										Meteorite Tier 1
-									</h3>
-									<span>
-										Research an automated way to gather Meteorite so that you don't have to worry about losing out when you're not around.
-										<br>
-										Costs <span id="unlockMeteoriteTier1Cost">75,000</span> Science.
-									</span>
-									<br>
-									<br>
-									<button onclick="unlockMeteoriteTier1()" class="btn btn-default">Unlock Meteorite Tier 1</button>
-									<br>
-									<br>
-								</td>
-							</tr>
-							<tr id="unlockMeteoriteTier2" class="hidden">
-								<td>
-									<h3 class="default btn-link">
-										Meteorite Tier 2
-									</h3>
-									<span>
-										Research a more efficient method of getting meteorite than creating it artificialy.
-										<br>
-										Costs <span id="unlockMeteoriteTier2Cost">100,000</span> Science.
-									</span>
-									<br>
-									<br>
-									<button onclick="unlockMeteoriteTier2()" class="btn btn-default">Unlock Meteorite Tier 2</button>
-									<br>
-									<br>
-								</td>
-							</tr>
-							<tr id="unlockDyson" class="hidden">
-								<td>
-									<h3 class="default btn-link">
-										Dyson Ring
-									</h3>
-									<span>
-										Dysons Rings produce huge amounts of energy by surrounding the sun in solar stations.
-										<br>
-										Costs <span id="unlockDysonCost">100,000</span> Science.
-									</span>
-									<br>
-									<br>
-									<button onclick="unlockDyson()" class="btn btn-default">Unlock Dyson Rings</button>
-									<br>
-									<br>
-								</td>
-							</tr>
-							<tr id="unlockBatteriesT2" class="hidden">
-							<td>
-								<h3 class="default btn-link">
-									Tier 2 Batteries
-								</h3>
-								<span>
-										Tier 2 Batteries improve the amount of energy you can store at once.
-										<br>
-										Costs <span id="unlockBatteriesT2Cost">300,000</span> Science.
-									</span>
-								<br>
-								<br>
-								<button onclick="unlockBatteriesT2()" class="btn btn-default">Unlock T2 Batteries</button>
-								<br>
-								<br>
-							</td>
-						</tr>
-							<tr id="unlockBatteriesT3" class="hidden">
-								<td>
-									<h3 class="default btn-link">
-										Tier 3 Batteries
-									</h3>
-									<span>
-										Tier 3 Batteries improve the amount of energy you can store at once.
-										<br>
-										Costs <span id="unlockBatteriesT3Cost">3M</span> Science.
-									</span>
-									<br>
-									<br>
-									<button onclick="unlockBatteriesT3()" class="btn btn-default">Unlock T3 Batteries</button>
-									<br>
-									<br>
-								</td>
-							</tr>
-							<tr id="unlockBatteriesT4" class="hidden">
-								<td>
-									<h3 class="default btn-link">
-										Tier 4 Batteries
-									</h3>
-									<span>
-										Tier 4 Batteries improve the amount of energy you can store at once.
-										<br>
-										Costs <span id="unlockBatteriesT4Cost">30M</span> Science.
-									</span>
-									<br>
-									<br>
-									<button onclick="unlockBatteriesT4()" class="btn btn-default">Unlock T4 Batteries</button>
-									<br>
-									<br>
-								</td>
-							</tr>
-							<tr id="unlockDysonSphere" class="hidden">
-								<td>
-									<h3 class="default btn-link">
-										Dyson Swarms and Spheres
-									</h3>
-									<span>
-										The Dyson Swarms encapsulate the sun in rings of solar stations, wheras Spheres completely encompasses it to allows you to harness enough energy to go interstellar.
-										<br>
-										Costs <span id="unlockDysonSphereCost">500,000</span> Science.
-									</span>
-									<br>
-									<br>
-									<button onclick="unlockDysonSphere()" class="btn btn-default">Unlock Dyson Swarms/Spheres</button>
-									<br>
-									<br>
-								</td>
-							</tr>
-							<tr id="scienceResourceEfficiencyUpgrade" style="display: none">
-								<td>
-									<h3 class="default btn-link" id="scienceResourceEfficiencyUpgradeTitle">Resource Efficiency</h3>
-									<span>
-										Resource Efficiency increases the income of resources by 1%/s per purchase.
-										<br>
-										Costs <span id="scienceResourceEfficiencyUpgradeCost">N/A</span> Science.
-									</span>
-									<br>
-									<br>
-									<button onclick="purchaseResourceEfficiency()" class="btn btn-default">Upgrade Efficiency</button>
-									<br>
-									<br>
-								</td>
-							</tr>
-							<tr id="scienceScienceEfficiencyUpgrade" style="display: none">
-								<td>
-									<h3 class="default btn-link" id="scienceScienceEfficiencyUpgradeTitle">Science Efficiency</h3>
-									<span>
-										Science Efficiency increases the science production by 2% per purchase.
-										<br>
-										Costs <span id="scienceScienceEfficiencyUpgradeCost">N/A</span> Science.
-									</span>
-									<br>
-									<br>
-									<button onclick="purchaseScienceEfficiency()" class="btn btn-default">Upgrade Efficiency</button>
-									<br>
-									<br>
-								</td>
-							</tr>
-							<tr id="scienceEnergyEfficiencyUpgrade" style="display: none">
-								<td>
-									<h3 class="default btn-link" id="scienceEnergyEfficiencyUpgradeTitle">Energy Efficiency</h3>
-									<span>
-										Energy Efficiency decreases the energy consumption of all machines by 1% per purchase (max 25%).
-										<br>
-										Costs <span id="scienceEnergyEfficiencyUpgradeCost">N/A</span> Science.
-									</span>
-									<delete id="energyEffButton">
-										<br>
-										<br>
-										<button id="scienceEnergyEfficiencyUpgradeButton" onclick="purchaseEnergyEfficiency()" class="btn btn-default">Upgrade Efficiency</button>
-										<br>
-										<br>
-									</delete>
-								</td>
-							</tr>
-							<tr id="scienceBatteryEfficiencyUpgrade" style="display: none">
-								<td>
-									<h3 class="default btn-link" id="scienceBatteryEfficiencyUpgradeTitle">Battery Efficiency</h3>
-									<span>
-										Battery Efficiency improves the storage capabilities of your batteries by 1% per upgrade (max 200%).
-										<br>
-										Costs <span id="scienceBatteryEfficiencyUpgradeCost">N/A</span> Science.
-									</span>
-									<br>
-									<br>
-									<button id="scienceBatteryEfficiencyUpgradeButton" onclick="purchaseBatteryEfficiency()" class="btn btn-default">Upgrade Efficiency</button>
-									<br>
-									<br>
-								</td>
-							</tr>
+							<!-- HTML is dynamically generated to fill this table -->
 						</table>
 					</div>
 				</div>
@@ -3722,7 +3574,7 @@
 									<br>
 									<br>
 									<button onclick="getChemicalPlant()" class="btn btn-default">Build Chemical Plant</button>
-									<button onclick="destroyMachine(chemicalPlant, 'chemicalPlant')" class="btn btn-default destroy hidden">Destroy Chemical Plant</button>
+									<button onclick="destroyMachine('chemicalPlant')" class="btn btn-default destroy hidden">Destroy Chemical Plant</button>
 									<br>
 									<br>
 								</td>
@@ -3744,7 +3596,7 @@
 									<br>
 									<br>
 									<button onclick="getOxidisation()" class="btn btn-default">Build Oxidisation Chamber</button>
-									<button onclick="destroyMachine(oxidisation, 'oxidisation')" class="btn btn-default destroy hidden">Destroy Oxidisation Chamber</button>
+									<button onclick="destroyMachine('oxidisation')" class="btn btn-default destroy hidden">Destroy Oxidisation Chamber</button>
 									<br>
 									<br>
 								</td>
@@ -3766,7 +3618,7 @@
 									<br>
 									<br>
 									<button onclick="getHydrazine()" class="btn btn-default">Build Hydrazine Catalyst</button>
-									<button onclick="destroyMachine(hydrazine, 'hydrazine')" class="btn btn-default destroy hidden">Destroy Hydrazine Catalyst</button>
+									<button onclick="destroyMachine('hydrazine')" class="btn btn-default destroy hidden">Destroy Hydrazine Catalyst</button>
 									<br>
 									<br>
 								</td>
@@ -3837,7 +3689,7 @@
 										The Moon
 									</h2>
 									<span>
-										The Moon is our largest satelite, revolving around the Earth once every 27 days. It contains a large quantity of Lunarite, left over from when it separated from the Earth billions of years ago. It is much stronger than regular metal and used to build more advanced machines.
+										The Moon is our largest satellite, revolving around the Earth once every 27 days. It contains a large quantity of Lunarite, left over from when it separated from the Earth billions of years ago. It is much stronger than regular metal and used to build more advanced machines.
 									</span>
 									<br>
 									<br>
@@ -3872,7 +3724,7 @@
 										Mercury
 									</h2>
 									<span>
-										Mercury is a lifeless rock with little to no value. It is not worth exploring on the ground as there are no valuble materials present.
+										Mercury is a lifeless rock with little to no value. It is not worth exploring on the ground as there are no valuable materials present.
 									</span>
 									<br>
 									<br>
@@ -4344,7 +4196,7 @@
 									<span>
 										As you enter the revolving pyramids, floating through space, you feel a small tug on your spacecraft as it gravitates towards an opening doorway in the side of the lowest section. Exiting your spacecraft, you experience the artificial gravity and walk to the large hallway ahead. Adorning the walls are four huge paintings of monolithic structures in the corners of the room with descriptions underneath. At the far end of the room is a giant door, closed without any indication of being able to open. You feel that there is a higher being watching over you as you walk through the room.
 										<br>
-										<b>NB: You must activate the wonders after building them to recieve their effects</b>
+										<b>NB: You must activate the wonders after building them to receive their effects</b>
 									</span>
 									<br>
 									<br>
@@ -4365,7 +4217,7 @@
 											He requires that you donate <span id="preciousGemCost">10,000</span> Gems, <span id="preciousSilverCost">7,500</span> Silver and <span id="preciousGoldCost">5,000</span> Gold for this knowledge.
 											<br>
 											<br>
-											<button onclick="achievePreciousWonder()" class="btn btn-default">Donate Metals</button>
+											<button onclick="achievePreciousWonder()" class="btn btn-default">Donate Resources</button>
 											<br>
 											<br>
 											<div id="preciousProgress" class="progress">
@@ -4385,14 +4237,14 @@
 									<span>
 										A pulsating image depicts a huge pyramid, with sparks of lightning. What could the Overlord want now?
 										<br>
-										"Having drained many stars of their energy, I want a structure build in honor of the energy I have taken from the galaxy with my mighty power. In return for building this, I will grant you ways to generate a form of power no man has been able to harness before."
+										"Having drained many stars of their energy, I want a structure built in honor of the energy I have taken from the galaxy with my mighty power. In return for building this, I will grant you ways to generate a form of power no man has been able to harness before."
 										<br>
 										<br>
 										<hide id="energeticWonderButton">
 											He requests a pyramid containing <span id="energeticWoodCost">10,000</span> Wood, <span id="energeticCharcoalCost">5,000</span> Charcoal and <span id="energeticUraniumCost">200</span> Uranium to acquire his methods.
 											<br>
 											<br>
-											<button onclick="achieveEnergeticWonder()" class="btn btn-default">Donate Energy</button>
+											<button onclick="achieveEnergeticWonder()" class="btn btn-default">Donate Resources</button>
 											<br>
 											<br>
 											<div id="energeticProgress" class="progress">
@@ -4644,7 +4496,7 @@
 										Rebuild Communication Wonder
 									</h3>
 									<span>
-										For rebuilding the Communication Wonder, you will be able to talk and listen to aliens in other star systems and determine whether there is sentient life outisde of our solar system.
+										For rebuilding the Communication Wonder, you will be able to talk and listen to aliens in other star systems and determine whether there is sentient life outside of our solar system.
 										<br>
 										<hide id="rebuildCommsWonder">
 											Costs: <span id="commsWonderGoldCost">6M</span> Gold, <span id="commsWonderSiliconCost">10M</span> Silicon, <span id="commsWonderIceCost">6M</span> Ice.
@@ -4716,7 +4568,7 @@
 										The Antimatter Wonder
 									</h2>
 									<span>
-										In the corner of the floor, you see a faintly glowing, large canister, proped up against the walls. The announcing message plays after pressing a red button next to it: 'This was my first antimatter tank for the maiden voyage of "The Interstellar", on my first trip to another star system. For repairing it and bringing back the memories, I will teach you about your own antimatter production to fuel your dreams of escaping your small piece of the universe.'
+										In the corner of the floor, you see a faintly glowing, large canister, propped up against the walls. The announcing message plays after pressing a red button next to it: 'This was my first antimatter tank for the maiden voyage of "The Interstellar", on my first trip to another star system. For repairing it and bringing back the memories, I will teach you about your own antimatter production to fuel your dreams of escaping your small piece of the universe.'
 									</span>
 								</td>
 							</tr>
@@ -4726,7 +4578,7 @@
 										Rebuild Antimatter Wonder
 									</h3>
 									<span>
-										For rebuilding the Antimatter Wonder, you will gain access to antimatter prodution and storage.
+										For rebuilding the Antimatter Wonder, you will gain access to antimatter production and storage.
 										<br>
 										<hide id="rebuildAntimatterWonder">
 											Costs: <span id="antimatterWonderUraniumCost">6M</span> Uranium, <span id="antimatterWonderLavaCost">10M</span> Lava, <span id="antimatterWonderOilCost">8M</span> Oil, <span id="antimatterWonderMethaneCost">6M</span> Methane.
@@ -4835,7 +4687,6 @@
 		</div>
 
 		<!-- Sol Center -->
-
 		<div role="tabpanel" class="tab-pane fade" id="solCenterPage">
 			<div class="container" style="width:250px; float:left">
 				<table class="table table-hover text-primary no-select pointer">
@@ -4856,7 +4707,7 @@
 					<tr id="unlockDysonNav" onclick="activeSolCenterTab('unlockDysonNav')" href="#unlockDysonResearch" aria-controls="unlockDysonResearch" role="tab" data-toggle="tab" style="height:60px;" class="sideTab">
 						<td style="vertical-align:middle;">
 							<span>
-								Dyson Sphere
+								Dyson Segments
 							</span>
 						</td>
 						<td style="vertical-align:middle;">
@@ -4875,7 +4726,7 @@
 										Plasma
 									</h2>
 									<span>
-										Plasma being a state of extreme energy, it can be used as a storage of large amounts and provides the ability to use higher tier machines and transmutions.
+										Plasma being a state of extreme energy, it can be used as a storage of large amounts and provides the ability to use higher tier machines and transmutations.
 									</span>
 								</td>
 							</tr>
@@ -4932,6 +4783,7 @@
 									</h3>
 									<p>
 										This is where you can convert your energy and plasma into resources. <b>(Right click to go back X10)</b>
+										<hide class="autoEmcHide hidden"><br>With Auto Emc (unlocked with rebirth), when you can automate multiple, the order will be top to bottom (always Max).</hide>
 									</p>
 									<div class="row">
 										<div class="col-md-12">
@@ -4950,6 +4802,7 @@
 													<th>Material</th>
 													<th>Current amount / Storage</th>
 													<th></th>
+													<th class="autoEmcHide hidden">Auto Emc</th>
 												</thead>
 												<tbody>
 													<tr>
@@ -4957,187 +4810,125 @@
 														<td><span id="uraniumEmcAmount">1</span> Uranium</td>
 														<td><span id="uraniumConv"><span data-bind="uranium">N/A</span> / <span data-bind="uraniumStorage">N/A</span></span></td>
 														<td><button class="btn btn-default pull-right" onclick="convertEnergy('uranium')" role="button">Convert</button></td>
+														<td class="autoEmcHide hidden" style="text-align:center;"><input type="checkbox" id="uraniumAutoEmc" class="autoEmc" />
 													</tr>
 													<tr>
 														<td><span id="lavaEmcVal">42</span> Energy</td>
 														<td><span id="lavaEmcAmount">1</span> Lava</td>
 														<td><span id="lavaConv"><span data-bind="lava">N/A</span> / <span data-bind="lavaStorage">N/A</span></span></td>
 														<td><button class="btn btn-default pull-right" onclick="convertEnergy('lava')" role="button">Convert</button></td>
+														<td class="autoEmcHide hidden" style="text-align:center;"><input type="checkbox" id="lavaAutoEmc" class="autoEmc" />
 													</tr>
 													<tr>
 														<td><span id="oilEmcVal">3</span> Energy</td>
 														<td><span id="oilEmcAmount">1</span> Oil</td>
 														<td><span id="oilConv"><span data-bind="oil">N/A</span> / <span data-bind="oilStorage">N/A</span></span></td>
 														<td><button class="btn btn-default pull-right" onclick="convertEnergy('oil')" role="button">Convert</button></td>
+														<td class="autoEmcHide hidden" style="text-align:center;"><input type="checkbox" id="oilAutoEmc" class="autoEmc" />
 													</tr>
 													<tr>
 														<td><span id="metalEmcVal">1</span> Energy</td>
 														<td><span id="metalEmcAmount">1</span> Metal</td>
 														<td><span id="metalConv"><span data-bind="metal">N/A</span> / <span data-bind="metalStorage">N/A</span></span></td>
 														<td><button class="btn btn-default pull-right" onclick="convertEnergy('metal')" role="button">Convert</button></td>
+														<td class="autoEmcHide hidden" style="text-align:center;"><input type="checkbox" id="metalAutoEmc" class="autoEmc" />
 													</tr>
 													<tr>
 														<td><span id="gemEmcVal">3</span> Energy</td>
 														<td><span id="gemEmcAmount">1</span> Gems</td>
 														<td><span id="gemConv"><span data-bind="gem">N/A</span> / <span data-bind="gemStorage">N/A</span></span></td>
 														<td><button class="btn btn-default pull-right" onclick="convertEnergy('gem')" role="button">Convert</button></td>
+														<td class="autoEmcHide hidden" style="text-align:center;"><input type="checkbox" id="gemAutoEmc" class="autoEmc" />
 													</tr>
 													<tr>
 														<td><span id="charcoalEmcVal">2</span> Energy</td>
 														<td><span id="charcoalEmcAmount">1</span> Charcoal</td>
 														<td><span id="charcoalConv"><span data-bind="charcoal">N/A</span> / <span data-bind="charcoalStorage">N/A</span></span></td>
 														<td><button class="btn btn-default pull-right" onclick="convertEnergy('charcoal')" role="button">Convert</button></td>
+														<td class="autoEmcHide hidden" style="text-align:center;"><input type="checkbox" id="charcoalAutoEmc" class="autoEmc" />
 													</tr>
 													<tr>
 														<td><span id="woodEmcVal">1</span> Energy</td>
 														<td><span id="woodEmcAmount">1</span> Wood</td>
 														<td><span id="woodConv"><span data-bind="wood">N/A</span> / <span data-bind="woodStorage">N/A</span></span></td>
 														<td><button class="btn btn-default pull-right" onclick="convertEnergy('wood')" role="button">Convert</button></td>
+														<td class="autoEmcHide hidden" style="text-align:center;"><input type="checkbox" id="woodAutoEmc" class="autoEmc" />
 													</tr>
 													<tr>
 														<td><span id="siliconEmcVal">23</span> Energy</td>
 														<td><span id="siliconEmcAmount">1</span> Silicon</td>
 														<td><span id="siliconConv"><span data-bind="silicon">N/A</span> / <span data-bind="siliconStorage">N/A</span></span></td>
 														<td><button class="btn btn-default pull-right" onclick="convertEnergy('silicon')" role="button">Convert</button></td>
+														<td class="autoEmcHide hidden" style="text-align:center;"><input type="checkbox" id="siliconAutoEmc" class="autoEmc" />
 													</tr>
 													<tr>
 														<td><span id="lunariteEmcVal">15</span> Energy</td>
 														<td><span id="lunariteEmcAmount">1</span> Lunarite</td>
 														<td><span id="lunariteConv"><span data-bind="lunarite">N/A</span> / <span data-bind="lunariteStorage">N/A</span></span></td>
 														<td><button class="btn btn-default pull-right" onclick="convertEnergy('lunarite')" role="button">Convert</button></td>
+														<td class="autoEmcHide hidden" style="text-align:center;"><input type="checkbox" id="lunariteAutoEmc" class="autoEmc" />
 													</tr>
 													<tr>
 														<td><span id="methaneEmcVal">12</span> Energy</td>
 														<td><span id="methaneEmcAmount">1</span> Methane</td>
 														<td><span id="methaneConv"><span data-bind="methane">N/A</span> / <span data-bind="methaneStorage">N/A</span></span></td>
 														<td><button class="btn btn-default pull-right" onclick="convertEnergy('methane')" role="button">Convert</button></td>
+														<td class="autoEmcHide hidden" style="text-align:center;"><input type="checkbox" id="methaneAutoEmc" class="autoEmc" />
 													</tr>
 													<tr>
 														<td><span id="titaniumEmcVal">17</span> Energy</td>
 														<td><span id="titaniumEmcAmount">1</span> Titanium</td>
 														<td><span id="titaniumConv"><span data-bind="titanium">N/A</span> / <span data-bind="titaniumStorage">N/A</span></span></td>
 														<td><button class="btn btn-default pull-right" onclick="convertEnergy('titanium')" role="button">Convert</button></td>
+														<td class="autoEmcHide hidden" style="text-align:center;"><input type="checkbox" id="titaniumAutoEmc" class="autoEmc" />
 													</tr>
 													<tr>
 														<td><span id="goldEmcVal">42</span> Energy</td>
 														<td><span id="goldEmcAmount">1</span> Gold</td>
 														<td><span id="goldConv"><span data-bind="gold">N/A</span> / <span data-bind="goldStorage">N/A</span></span></td>
 														<td><button class="btn btn-default pull-right" onclick="convertEnergy('gold')" role="button">Convert</button></td>
+														<td class="autoEmcHide hidden" style="text-align:center;"><input type="checkbox" id="goldAutoEmc" class="autoEmc" />
 													</tr>
 													<tr>
 														<td><span id="silverEmcVal">42</span> Energy</td>
 														<td><span id="silverEmcAmount">1</span> Silver</td>
 														<td><span id="silverConv"><span data-bind="silver">N/A</span> / <span data-bind="silverStorage">N/A</span></span></td>
 														<td><button class="btn btn-default pull-right" onclick="convertEnergy('silver')" role="button">Convert</button></td>
+														<td class="autoEmcHide hidden" style="text-align:center;"><input type="checkbox" id="silverAutoEmc" class="autoEmc" />
 													</tr>
 													<tr>
 														<td><span id="hydrogenEmcVal">42</span> Energy</td>
 														<td><span id="hydrogenEmcAmount">1</span> Hydrogen</td>
 														<td><span id="hydrogenConv"><span data-bind="hydrogen">N/A</span> / <span data-bind="hydrogenStorage">N/A</span></span></td>
 														<td><button class="btn btn-default pull-right" onclick="convertEnergy('hydrogen')" role="button">Convert</button></td>
+														<td class="autoEmcHide hidden" style="text-align:center;"><input type="checkbox" id="hydrogenAutoEmc" class="autoEmc" />
 													</tr>
 													<tr>
 														<td><span id="heliumEmcVal">42</span> Energy</td>
 														<td><span id="heliumEmcAmount">1</span> Helium</td>
 														<td><span id="heliumConv"><span data-bind="helium">N/A</span> / <span data-bind="heliumStorage">N/A</span></span></td>
 														<td><button class="btn btn-default pull-right" onclick="convertEnergy('helium')" role="button">Convert</button></td>
+														<td class="autoEmcHide hidden" style="text-align:center;"><input type="checkbox" id="heliumAutoEmc" class="autoEmc" />
 													</tr>
 													<tr>
 														<td><span id="iceEmcVal">42</span> Energy</td>
 														<td><span id="iceEmcAmount">1</span> Ice</td>
 														<td><span id="iceConv"><span data-bind="ice">N/A</span> / <span data-bind="iceStorage">N/A</span></span></td>
 														<td><button class="btn btn-default pull-right" onclick="convertEnergy('ice')" role="button">Convert</button></td>
+														<td class="autoEmcHide hidden" style="text-align:center;"><input type="checkbox" id="iceAutoEmc" class="autoEmc" />
 													</tr>
-													<tr>
+													<tr id="meteoriteEMC" class="hidden">
 														<td><span id="meteoriteEmcVal">42</span> Plasma</td>
 														<td><span id="meteoriteEmcAmount">1</span> Meteorite</td>
 														<td><span id="meteoriteConv"><span data-bind="meteorite">N/A</span> / <span data-bind="meteoriteStorage">N/A</span></span></td>
 														<td><button class="btn btn-default pull-right" onclick="convertPlasma('meteorite')" role="button">Convert</button></td>
+														<td class="autoEmcHide hidden" style="text-align:center;"><input type="checkbox" id="meteoriteAutoEmc" class="autoEmc" />
 													</tr>
 												</tbody>
 											</table>
 											</div>
 										</div>
 									</div>
-									<table style="width:775px; display: none">
-										<tr>
-											<td colspan="3">
-												<button id="uraniumConv" onclick="convertEnergy('uranium')" class="btn btn-default" style="width:100%"><span id="uraniumEmcVal">37</span> Energy -> <span class="emcAmount">1</span> Uranium</button>
-											</td>
-											<td colspan="3">
-												<button id="lavaConv" onclick="convertEnergy('lava')" class="btn btn-default" style="width:100%"><span id="lavaEmcVal">42</span> Energy -> <span class="emcAmount">1</span> Lava</button>
-											</td>
-										</tr>
-										<tr>
-											<td height="20px"></td>
-										</tr>
-										<tr>
-											<td colspan="2">
-												<button id="oilConv" onclick="convertEnergy('oil')" class="btn btn-default" style="width:100%"><span id="oilEmcVal">3</span> Energy -> <span class="emcAmount">1</span> Oil</button>
-											</td>
-											<td colspan="2">
-												<button id="metalConv" onclick="convertEnergy('metal')" class="btn btn-default" style="width:100%"><span id="metalEmcVal">1</span> Energy -> <span class="emcAmount">1</span> Metal</button>
-											</td>
-											<td colspan="2">
-												<button id="gemConv" onclick="convertEnergy('gem')" class="btn btn-default" style="width:100%"><span id="gemEmcVal">3</span> Energy -> <span class="emcAmount">1</span> Gems</button>
-											</td>
-										</tr>
-										<tr>
-											<td colspan="2">
-												<button id="charcoalConv" onclick="convertEnergy('charcoal')" class="btn btn-default" style="width:100%"><span id="charcoalEmcVal">2</span> Energy -> <span class="emcAmount">1</span> Charcoal</button>
-											</td>
-											<td colspan="2">
-												<button id="woodConv" onclick="convertEnergy('wood')" class="btn btn-default" style="width:100%"><span id="woodEmcVal">1</span> Energy -> <span class="emcAmount">1</span> Wood</button>
-											</td>
-											<td colspan="2">
-												<button id="siliconConv" onclick="convertEnergy('silicon')" class="btn btn-default" style="width:100%"><span id="siliconEmcVal">23</span> Energy -> <span class="emcAmount">1</span> Silicon</button>
-											</td>
-										</tr>
-										<tr>
-											<td height="20px"></td>
-										</tr>
-										<tr>
-											<td colspan="2">
-												<button id="lunariteConv" onclick="convertEnergy('lunarite')" class="btn btn-default" style="width:100%"><span id="lunariteEmcVal">15</span> Energy -> <span class="emcAmount">1</span> Lunarite</button>
-											</td>
-											<td colspan="2">
-												<button id="methaneConv" onclick="convertEnergy('methane')" class="btn btn-default" style="width:100%"><span id="methaneEmcVal">12</span> Energy -> <span class="emcAmount">1</span> Methane</button>
-											</td>
-											<td colspan="2">
-												<button id="titaniumConv" onclick="convertEnergy('titanium')" class="btn btn-default" style="width:100%"><span id="titaniumEmcVal">17</span> Energy -> <span class="emcAmount">1</span> Titanium</button>
-											</td>
-										</tr>
-										<tr>
-											<td colspan="3">
-												<button id="goldConv" onclick="convertEnergy('gold')" class="btn btn-default" style="width:100%"><span id="goldEmcVal">14</span> Energy -> <span class="emcAmount">1</span> Gold</button>
-											</td>
-											<td colspan="3">
-												<button id="silverConv" onclick="convertEnergy('silver')" class="btn btn-default" style="width:100%"><span id="silverEmcVal">16</span> Energy -> <span class="emcAmount">1</span> Silver</button>
-											</td>
-										</tr>
-										<tr>
-											<td height="20px"></td>
-										</tr>
-										<tr>
-											<td colspan="2">
-												<button id="hydrogenConv" onclick="convertEnergy('hydrogen')" class="btn btn-default" style="width:100%"><span id="hydrogenEmcVal">33</span> Energy -> <span class="emcAmount">1</span> Hydrogen</button>
-											</td>
-											<td colspan="2">
-												<button id="heliumConv" onclick="convertEnergy('helium')" class="btn btn-default" style="width:100%"><span id="heliumEmcVal">39</span> Energy -> <span class="emcAmount">1</span> Helium</button>
-											</td>
-											<td colspan="2">
-												<button id="iceConv" onclick="convertEnergy('ice')" class="btn btn-default" style="width:100%"><span id="iceEmcVal">44</span> Energy -> <span class="emcAmount">1</span> Ice</button>
-											</td>
-										</tr>
-										<tr>
-											<td height="20px"></td>
-										</tr>
-										<tr id="meteoriteEMC" class="hidden">
-											<td colspan="6">
-												<button id="meteoriteConv" onclick="convertPlasma('meteorite')" class="btn btn-default" style="width:100%"><span id="meteoriteEmcVal">3</span> Plasma -> <span class="emcAmount">1</span> Meteorite</button>
-											</td>
-										</tr>
-									</table>
 								</td>
 							</tr>
 						</table>
@@ -5223,7 +5014,7 @@
 											<br>
 											<br>
 											<h3 class="default btn-link">
-												Sphere: <span id="sphere">0</span> (Max. 1)
+												Sphere: <span id="sphere">0</span> (Max. <span id="sphereMax">1</span>)
 											</h3>
 											<span>
 												The entire sphere is a monolithic structure completely surrounding the sun. It will allow for enough energy to get interstellar travel and finally escape this Solar System. It will produce 1,000,000 energy per second.
@@ -5235,7 +5026,10 @@
 												<br>
 												<br>
 											</span>
-											<button id="buildSphereButton" onclick="buildSphere()" class="btn btn-default">Construct Sphere</button>
+											<hide id="buildSphereButton">
+												<button onclick="buildSphere()" class="btn btn-default">Construct Sphere</button>
+												<button onclick="buildDysonTo(250);buildSphere()" class="btn btn-default">Build up to 250 and Sphere</button>
+											</hide>
 										</hide>
 									</span>
 								</td>
@@ -5245,8 +5039,6 @@
 				</div>
 			</div>
 		</div>
-
-
 
 		<!-- Machines Tab -->
 		<div role="tabpanel" class="tab-pane fade in" id="machineTab">
@@ -6723,236 +6515,6 @@
 			</div>
 		</div>
 
-		<!-- Interstellar Tab -->
-		<div role="tabpanel" class="tab-pane fade" id="interstellar">
-			<div class="container" style="width:250px; float:left">
-				<table class="table table-hover text-primary no-select pointer">
-					<tr id="commsNav" onclick="activeInterstellarTab('commsNav')" href="#commsTab" aria-controls="commsTab" role="tab" data-toggle="tab" style="height:60px;" class="sideTab hidden">
-						<td style="border:none; vertical-align:middle;" colspan="3">
-							<span>
-								Communications
-							</span>
-						</td>
-					</tr>
-					<tr id="interRocketNav" onclick="activeInterstellarTab('interRocketNav')" href="#interRocketTab" aria-controls="interRocketTab" role="tab" data-toggle="tab" style="height:60px;" class="sideTab hidden">
-						<td style="vertical-align:middle;" colspan="2">
-							<span>
-								Rocket
-							</span>
-						</td>
-						<td style="vertical-align:middle; text-align:right;">
-							<span id="interRocketBuilt" class="red">
-								Not Built
-							</span>
-						</td>
-					</tr>
-					<tr id="antimatterNav" onclick="activeInterstellarTab('antimatterNav')" href="#antimatterTab" aria-controls="antimatterTab" role="tab" data-toggle="tab" style="height:60px;" class="sideTab hidden">
-						<td style="vertical-align:middle;">
-							<span>
-								Antimatter
-							</span>
-						</td>
-						<td style="vertical-align:middle; text-align:center;">
-							<span>
-								<span id="antimatterps">0</span>/Sec
-							</span>
-						</td>
-						<td style="vertical-align:middle; text-align:right;">
-							<span id="antimatter">
-								0
-							</span>
-						</td>
-					</tr>
-					<tr id="travelNav" onclick="activeInterstellarTab('travelNav')" href="#travelTab" aria-controls="travelTab" role="tab" data-toggle="tab" style="height:60px;" class="sideTab hidden">
-						<td style="vertical-align:middle;" colspan="3">
-							<span>
-								Travel
-							</span>
-						</td>
-					</tr>
-				</table>
-			</div>
-			<div class="tab-content">
-				<div id="commsTab" class="tab-pane fade in" style="margin-left:10px; float:left;">
-					<div class="container" style="max-width:800px;">
-						<table class="table">
-							<tr>
-								<td style="border:none;">
-									<h2 class="default btn-link">
-										Communications
-									</h2>
-									<span>
-										This is where you learn about other systems to travel to.
-									</span>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<h3 class="default btn-link">
-										Interstellar Radar Scanner: <span id="IRS">0</span>
-									</h3>
-									<span>
-										The Overlord gifts you with the technology to discover stars in outer space by using the IRS. It can find any Tier 1 stars that are close by. Each one increases the range by 5 Light Years.
-										<br>
-										Costs <span id="IRSMetalCost">38.6B</span> Metal, <span id="IRSIceCost">4.32B</span> Ice, <span id="IRSMeteoriteCost">15.8M</span> Meteorite.
-									</span>
-									<br>
-									<br>
-									<button onclick="Game.interstellar.getIRS()" class="btn btn-default">Get IRS</button>
-								</td>
-							</tr>
-						</table>
-					</div>
-				</div>
-				<div id="interRocketTab" class="tab-pane fade in" style="margin-left:10px; float:left;">
-					<div class="container" style="max-width:800px;">
-						<table class="table">
-							<tr>
-								<td style="border:none;">
-									<h2 class="default btn-link">
-										Rockets
-									</h2>
-									<span>
-										This is where you can construct your transport to the stars.
-									</span>
-									<br>
-									<br>
-									The Tier 1 Rocket can travel a maximum of 5 light years from Earth.
-									<br>
-									It costs 50 Shield Plating, 25 Engine Units, 15 Aerodynamic Wings.
-									<br>
-									<br>
-									<hide class="interRocketBuild">
-										<button onclick="Game.interstellar.buildRocket()" class="btn btn-default">Build Tier 1 Rocket</button>
-										<br>
-										<br>
-									</hide>
-									<!-- <h4 id="T1Rocket" class="hidden">
-										Tier 1 Rocket: Built
-									</h4> -->
-								</td>
-							</tr>
-							<tr class="interRocketBuild">
-								<td>
-									<h3 class="default btn-link">
-										Shield Plating: <span id="shield">0</span>/50
-									</h3>
-									<span>
-										This plating combats the Sun's radiation, and can protect anyone inside from the frigid cold of space.
-										<br>
-										Costs <span id="shieldLunariteCost">100,000</span> Lunarite, <span id="shieldTitaniumCost">100,000</span> Titanium, <span id="shieldMetalCost">100,000</span> Metal.
-									</span>
-									<br>
-									<br>
-									<button onclick="Game.interstellar.getShield()" class="btn btn-default">Get Shield Plating</button>
-								</td>
-							</tr>
-							<tr class="interRocketBuild">
-								<td>
-									<h3 class="default btn-link">
-										Engine Units: <span id="engine">0</span>/25
-									</h3>
-									<span>
-										These combine antimatter with matter in a controlled reaction to create propulsion that will carry you to the stars.
-										<br>
-										Costs <span id="engineSiliconCost">500,000</span> Silicon, <span id="engineMeteoriteCost">10,000</span> Meteorite, <span id="engineHydrogenCost">250,000</span> Hydrogen.
-									</span>
-									<br>
-									<br>
-									<button onclick="Game.interstellar.getEngine()" class="btn btn-default">Get Engine Unit</button>
-								</td>
-							</tr>
-							<tr class="interRocketBuild">
-								<td>
-									<h3 class="default btn-link">
-										Aerodynamic Sections: <span id="aero">0</span>/15
-									</h3>
-									<span>
-										These allow for easy takeoffs and landings out of atmospheres so that you don't have to worry about air resistance.
-										<br>
-										Costs <span id="aeroSilverCost">200,000</span> Silver, <span id="aeroIceCost">300,000</span> Ice, <span id="aeroGemCost">250,000</span> Gems.
-									</span>
-									<br>
-									<br>
-									<button onclick="Game.interstellar.getAero()" class="btn btn-default">Get Aerodynamic Section</button>
-								</td>
-							</tr>
-						</table>
-					</div>
-				</div>
-				<div id="antimatterTab" class="tab-pane fade in" style="margin-left:10px; float:left;">
-					<div class="container" style="max-width:800px;">
-						<table class="table">
-							<tr>
-								<td style="border:none;">
-									<h2 class="default btn-link">
-										Antimatter
-									</h2>
-									<span>
-										Your fuel for interstellar travel is produced here. Unfortunately, you can only handle 100k Antimatter per Star System as it is incredibly volatile.
-									</span>
-									<br>
-									<br>
-									<button onclick="toggleAntimatter()" class="btn btn-default">Turn Antimatter <span id="antimatterToggled">Off</span></button>
-									<br>
-									<br>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<h3 class="default btn-link">
-										Alcubierre Drive: <span id="drive">0</span>
-									</h3>
-									<span>
-										This powerful reactor can turn high-energy plasma into an extremely efficient fuel: Antimatter
-										<br>
-										Produces 0.5 Antimatter per second.
-										<br>
-										Uses 100 Plasma and 12k Ice per second.
-										<br>
-										Costs <span id="driveSilverCost">163.0M</span> Silver, <span id="driveOilCost">712.0M</span> Oil, <span id="driveMeteoriteCost">12.30M</span> Meteorite.
-									</span>
-									<br>
-									<br>
-									<button onclick="Game.interstellar.getDrive()" class="btn btn-default">Get Alcubierre Drive</button>
-									<button onclick="if(Game.interstellar.machines.drive.count > 0){Game.interstellar.machines.drive.count -= 1; Game.interstellar.refreshUI();}" class="btn btn-default">Destroy Alcubierre Drive</button>
-								</td>
-							</tr>
-						</table>
-					</div>
-				</div>
-				<div id="travelTab" class="tab-pane fade in" style="margin-left:10px; float:left;">
-					<div class="container" style="max-width:800px;">
-						<table class="table">
-							<tr>
-								<td style="border:none;">
-									<h2 class="default btn-link">
-										Travel (Coming Soon!)
-									</h2>
-									<span>
-										Here, you can travel across the cosmos.
-									</span>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<h3 class="default btn-link">
-										ABC: <span id="XXXX">0</span>
-									</h3>
-									<span>
-										ABC
-									</span>
-									<br>
-									<br>
-									<button onclick="exploreABC()" class="btn btn-default">Explore ABC</button>
-								</td>
-							</tr>
-						</table>
-					</div>
-				</div>
-			</div>
-		</div>
-
 		<!-- More Tab -->
 		<div role="tabpanel" class="tab-pane fade" id="more">
 			<div class="container" style="width:250px; float:left">
@@ -7110,6 +6672,7 @@
 				                		<option value="base">Base</option>
 				                		<option value="cerulean">Cerulean</option>
 				                		<option value="cyborg">Cyborg</option>
+				                		<option value="cyborg2">Cyborg V2</option>
 				                		<option value="darkly">Darkly</option>
 				                		<option value="flatly">Flatly</option>
 				                		<option value="paper">Paper</option>
@@ -7124,7 +6687,7 @@
 							<tr>
 								<td>
 									<h3 class="default btn-link">
-										Formatting
+										Notation
 									</h3>
 									<select id="formatSelector" ng-model="player.current_theme" class="ng-valid ng-touched ng-dirty ng-valid-parse">
 										<option value="raw">Raw</option>
@@ -7160,7 +6723,17 @@
 							<tr>
 								<td>
 									<h3 class="default btn-link">
-										Notifications
+										Autosave Notifications
+									</h3>
+				                	<div class="checkbox">
+										<label><input id="saveNotifsEnabled" type="checkbox" value="">Autosave Notifications</label>
+									</div>
+				                </td>
+							</tr>
+							<tr>
+								<td>
+									<h3 class="default btn-link">
+										Notifications (Not Autosave)
 									</h3>
 				                	<div class="checkbox">
 										<label><input id="notificationsEnabled" type="checkbox" value="">Screen Notifications</label>
@@ -7194,6 +6767,16 @@
 									</h3>
 				                	<div class="checkbox">
 										<label><input id="redDestroyButtons" type="checkbox" value="">Destroy Buttons Red</label>
+									</div>
+				                </td>
+							</tr>
+							<tr>
+								<td>
+									<h3 class="default btn-link">
+										Hide Completed Tabs
+									</h3>
+				                	<div class="checkbox">
+										<label><input id="hideCompleted" type="checkbox" value="">Hidden</label>
 									</div>
 				                </td>
 							</tr>
@@ -7232,7 +6815,7 @@
 										Achievements
 									</h2>
 									<span>
-										This is where you can see your rank and all of your achievements.
+										This is where you can see your rank and all of your achievements.<br>XP = Star position: [1,2,3,4,5]
 									</span>
 								</td>
 								<td id="rankContent" style="border:none;"></td>
@@ -7287,6 +6870,8 @@
 										<a href="https://github.com/sparticle999/SpaceCompany#changelog">Changelog</a> / <a href="https://www.reddit.com/r/SpaceCompany/wiki/futureplans">Future Plans</a>
 										<br>
 										<a href="https://www.reddit.com/r/SpaceCompany/wiki/index">Wiki</a>
+										<br>
+										<a href="https://www.discord.gg/277CMCx">Discord</a>
 									</span>
 								</td>
 							</tr>
@@ -7297,7 +6882,6 @@
 		</div>
 
 		<!-- Help -->
-
 		<div role="tabpanel" class="tab-pane fade in" id="help">
 			<div class="container" style="width:250px; float:left;">
 				<table class="table table-hover text-primary no-select pointer">
@@ -7414,6 +6998,16 @@
 							<tr>
 								<td>
 									<h4>
+										How does the military level work?
+									</h4>
+									<span>
+										The format used is •,••,•••,I,II,III,X,XX,XXX,XXXX,XXXXX,XXXXXX. It is based on the military army hierarchy found on wikipedia at <a href="https://en.wikipedia.org/wiki/Military_organization#Army_hierarchy">https://en.wikipedia.org/wiki/Military_organization#Army_hierarchy</a>.
+									</span>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<h4>
 										I found a bug! What should I do?
 									</h4>
 									<span>
@@ -7446,7 +7040,7 @@
 							<tr>
 								<td>
 									<h4>
-										Help, I'm stuck?
+										Help, I'm stuck!
 									</h4>
 									<span>
 										Have you checked all of the tabs to see if there is anything new? Maybe the guide has something about it? If not, feel free to ask me either on reddit or post it as an issue on github if you think there is a problem with the game.
@@ -7469,7 +7063,7 @@
 										I want to help. How do I do that?
 									</h4>
 									<span>
-										Help is always appreciated! You can look over my code in <a href="http://github.com/sparticle999/SpaceCompany">Github</a> and fork it to make changes. Send me a push request, sumbit an issue or just tell me in reddit and I'll most likely be happy to add it in and give credit where due.
+										Help is always appreciated! You can look over my code in <a href="http://github.com/sparticle999/SpaceCompany">Github</a> and fork it to make changes. Send me a push request, submit an issue or just tell me in reddit and I'll most likely be happy to add it in and give credit where due.
 									</span>
 								</td>
 							</tr>
@@ -7513,7 +7107,7 @@
 									<span>
 										This game is made by me, Sparticle999, as a project to improve my skills at making games and to see what I could add to the incremental gaming world.
 										<br>
-										The content in this game is not always accurate. This is because if it were accurate, many of the elements on other planets would be the same as Earth's, such as metal on Mars (iron oxide). Thus, I have had to make up some facts to help my game stay diverse. I appologise for any infuriation caused.
+										The content in this game is not always accurate. This is because if it were accurate, many of the elements on other planets would be the same as Earth's, such as metal on Mars (iron oxide). Thus, I have had to make up some facts to help my game stay diverse. I apologise for any infuriation caused.
 									</span>
 								</td>
 							</tr>
@@ -7529,8 +7123,24 @@
 										<a class="pointer btn-link" target="_blank" href="http://bootswatch.com/">Bootswatch</a> is the tool that I used to add the different themes to the game. If anyone wants more themes from this website, I would be happy to add them in.
 										<br>
 										<br>
-										Most of the images are from <a class="pointer btn-link" target="_blank" href="https://www.shutterstock.com/">Shuttershock</a> and retextured and edited by myself to fit the theme of this game.
+										Most of the images are from <a class="pointer btn-link" target="_blank" href="https://www.shutterstock.com/">Shutterstock</a> and retextured and edited by myself to fit the theme of this game.
 									</span>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<h3 class="default btn-link">
+										Thank you to all Donators and my supporters on Patreon!
+									</h3>
+									<h4>Patreon:</h4>
+									<ul>
+										<li>Tom Paine</li>
+									</ul>
+									<h4>Paypal Donators:</h4>
+									<ul>
+										<li>Steve Chahine</li>
+										<li></li>
+									</ul>
 								</td>
 							</tr>
 						</table>
@@ -7555,6 +7165,7 @@
 <script type="text/javascript" src="utils.js"></script>
 <script type="text/javascript" src="updates.js"></script>
 <script type="text/javascript" src="achievements.js"></script>
+<script type="text/javascript" src="data/achievementsData.js"></script>
 <script type="text/javascript" src="constants.js"></script>
 <script type="text/javascript" src="statistics.js"></script>
 <script type="text/javascript" src="resource.js"></script>
@@ -7567,7 +7178,7 @@
 <script type="text/javascript" src="data/starData.js"></script>
 <script type="text/javascript" src="settings.js"></script>
 
-<script type="text/javascript" src="interstellarBETA.js"></script>
+<script type="text/javascript" src="interstellar.js"></script>
 <script type="text/javascript" src="star.js"></script>
 <script type="text/javascript" src="rocketParts.js"></script>
 <script type="text/javascript" src="rocket.js"></script>
@@ -7583,6 +7194,7 @@
 <script type="text/javascript" src="ui/statisticUI.js"></script>
 <script type="text/javascript" src="ui/stargazeUI.js"></script>
 <script type="text/javascript" src="ui/resourceUI.js"></script>
+<script type="text/javascript" src="ui/techUI.js"></script>
 <script type="text/javascript" src="ui/legacyUI.js"></script>
 
 <script type="text/javascript" src="core.js"></script>
@@ -7593,8 +7205,6 @@
 <script type="text/javascript" src="solarSystem.js"></script>
 <script type="text/javascript" src="wonder.js"></script>
 <script type="text/javascript" src="solCenter.js"></script>
-<script type="text/javascript" src="interstellar.js"></script>
-
 
 <!-- RELEASE -->
 <!--<script type="text/javascript" src="SpaceCompany.min.js"></script>-->

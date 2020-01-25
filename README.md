@@ -11,36 +11,71 @@ Currently, the game is in Beta, which means there is frequent, active developmen
 
 # RoadMap
 
-v0.6.0 The Lore Update
+v1.0 The Overlord Update
 https://www.reddit.com/r/SpaceCompany/wiki/futureplans#wiki_v0.6
 
 - Adding Lore onto every Building and an introduction to your Space Company
 - Rebalance all costs to not use as much Lunarite/Gems
 - Loading screen flavour text changes as you progress
-- Change Lunarite to a proper name
-
-v0.5.0 The Interstellar Update
-https://www.reddit.com/r/SpaceCompany/wiki/futureplans#wiki_v0.5
-
-- Dark Matter
-- Prestige (https://www.reddit.com/r/SpaceCompany/comments/6lcgzu/plan_for_prestige/)
-- Unknown Planets that you have to explore to know what it holds
-- Each star system is more hostile than the last until prestige, where it resets
-- Pushing Planets into the Sun gets prestige currency
 - Machine Overview Tab
-- Space Elevator
-- Mass to Energy Conversion
+
+v0.5.1
+
+- (Mass to Energy Conversion)
 - Buy X buttons
 - Buy Max/Custom Buttons
-- Reduce Storage Costs
-- Achievements with Bonuses
 - Change Letter Formatting To Start At 100K
 - Rebalance Science
 - Change Icons (white circle with icon inside)
 
 # Changelog:
 
-### v0.5.0
+### v0.5.1 (includes all V0.5.0.X)
+##### Features
+
+- Storage Upgrade Discounts
+- T5 batteries
+- Fixed Huge Memory Leak
+- Multiple Spheres
+- Auto Emc
+- Redid Rebirth
+- Respec
+- Meteorite Tier 3 and 4
+- Live counter showing how much DM you will get from each section
+- Fixed Energy Efficiency 25/50 max bug
+- Heavily Expanded Interstellar Star List
+
+##### Small Changes
+
+- Made Alpha Centauri distance clear
+- You cannot rebirth without a sphere
+- Fixed higher antimatter storages not saving
+- Reduced framerate from 100fps to 10fps
+- Build 250 Segments and Dyson Sphere Button
+- Balanced Ice T5 to have cost just below storage level rather than above it
+- AutoEmc keeps a 10K bank of plasma to avoid meteorite production depletion due to 0 plasma stored
+- Buffed Capital Ship\' power and defense
+- Reduced Oil T3 energy cost
+- Made Science and Resource Efficiency multiplicative with dark matter boost
+
+##### Bug Fixed
+
+- Fixed Comms wonder not showing interstellar tab
+- Fixed TARDIS production being incorrect
+- Fixed Storage Discount not working
+- Fixed Storage Upgrade overwriting old storages if greater than 6400
+- Fixed Tier 1 Rocket not showing red costs when inadequate
+- Fixed Subsequent Rebirths
+- Fixed Plasma not showing Gain 20
+- Fixed Wonders showing up as activated after rebirth
+- Fixed Solar System Showing planets before exploring requirements
+- Fixed AutoEmc using energy for meteorite
+- Fixed Fusion Reactor not using enough Hydrogen
+- Fixed Invasion Chance being NaN when reputation is above 60
+- Fixed Absorb not working
+- Fixed Antimatter not being affected by DM Boost
+
+### v0.5.0 The Interstellar Update
 ##### Features
 
 - Offline Production
@@ -72,6 +107,11 @@ https://www.reddit.com/r/SpaceCompany/wiki/futureplans#wiki_v0.5
 - Achievement Ranks
 - Renamed Space Metal as Lunarite
 - The Wonder Tab hides itself when completed (makes space for more tabs)
+- Rebuilt Achievement Tooltips
+- Dark Matter
+- Hide Completed Tabs Button
+- Added Astronomical Breakthrough
+- Seperate Option for Autosave Notifications
 
 ##### Small Changes
 
@@ -100,7 +140,12 @@ https://www.reddit.com/r/SpaceCompany/wiki/futureplans#wiki_v0.5
 - Buffed Hydrazine Production
 - Achievement Number Formatting
 - Rocket Fuel Machine Achievements
-- Fixed Hydrazine Not Getting Resource Efficiency
+- Refactored EMC (behind the scenes)
+- Optimised Saving and Loading
+- Time until storage full now shows until empty if negative gain
+- Reset achievements
+- Standardised gainResource() function
+- Achievement Stars are worth their position
 
 ##### Bug Fixes
 
@@ -132,6 +177,12 @@ https://www.reddit.com/r/SpaceCompany/wiki/futureplans#wiki_v0.5
 - Fixed Antimatter Going Above 100k
 - Fixed Buying Multiple Solar System Rockets
 - Fixed T4 Science unlocking only after refresh
+- Fixed Hydrazine Not Getting Resource Efficiency
+- Fixed Exponential Notation UI
+- Fixed Typos
+- Fixed Stargaze not showing up until refresh
+- Fixed Silicon Achievement not existing
+- Fixed Logo not animating
 
 ### v0.4.4
 ##### Features

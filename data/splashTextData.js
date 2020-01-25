@@ -1,5 +1,4 @@
-var splashTextArray = [
-"Venturing Into The Unknown...",
+var splashTextArray = ["Venturing Into The Unknown...",
 "Installing Virus...",
 "Deleting Windows...",
 "Transferring Data to NASA...",
@@ -21,12 +20,13 @@ var splashTextArray = [
 "Absolutely no memes!",
 "Also try Kittens!",
 "Also try Dark Room!",
+"Also try Factorio!",
 "As seen online!",
 "May contain meteorite.",
 "Dysons FTW",
 "Overpriced Storage!",
 "Casual gaming!",
-"Ceci n'est pas une title screen!",
+"Ceci n'est pas un titre écran!",
 "Open Source!",
 "Child's play!",
 "Who's the Overlord?",
@@ -45,7 +45,7 @@ var splashTextArray = [
 "Hard to label!",
 "Does not include fidget spinners.",
 "Dyson Spheres: Better than fidget spinners!",
-"Reversing entropy by making contracts",
+"Reversing entropy by making contracts...",
 "Data is king!",
 "Do you have any grapes?",
 "[Citation Needed]",
@@ -79,7 +79,7 @@ var splashTextArray = [
 "The sky isn't the limit!",
 "The true meaning of covfefe",
 "This isn't even my final form!",
-"This message will never appear on the splash screen, isn't that weird?",
+"This message will never appear on the splash screen - isn't that weird?",
 "Introducing Turtles...",
 "Tens of colours!",
 "Throw yourself at the ground and miss",
@@ -102,6 +102,9 @@ var splashTextArray = [
 "0% Sugar!",
 "0% Organic!",
 "JavaScript!",
+"Recruiting Robot Hamsters...",
+"Autoclickers strictly discouraged!",
+"Even more in-depth than Kerbal Space Program!",
 ];
 var splashText = splashTextArray[Math.floor(Math.random()*splashTextArray.length)];
 
@@ -112,7 +115,10 @@ if(currentDate.indexOf("Jan 01") !== -1){
 if(currentDate.indexOf("Feb 14") !== -1){
 	splashText = "Happy Valentines!";
 }
+if(currentDate.indexOf("Sep 12") !== -1){
+	splashText = "6 Month Anniversary! V0.5 Released!";
+}
 if(currentDate.indexOf("Dec 25") !== -1){
 	splashText = "Merry Christmas!";
 }
-document.getElementById("splashText").innerHTML = splashText;
+document.getElementById("splashText").textContent = splashText;

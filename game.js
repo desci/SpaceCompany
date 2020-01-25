@@ -6,7 +6,7 @@ var Game = (function() {
         lastUpdateTime: 0,
         intervals: {},
         uiComponents: [],
-        logoAnimating: false,
+        logoAnimating: true,
         timeSinceAutoSave: 0,
         activeNotifications: {},
         lastFixedUpdate: new Date().getTime()
@@ -76,7 +76,8 @@ var Game = (function() {
 
     instance.slowUpdate = function(self, delta) {
         refreshConversionDisplay();
-        refreshTimeUntilFull();
+        refreshTimeUntilLimit();
+        gainAutoEmc();
 
         checkStorages();
 
@@ -141,6 +142,7 @@ var Game = (function() {
         this.tech.save(data);
         this.settings.save(data);
         this.interstellar.save(data);
+        this.stargaze.save(data);
         this.updates.save(data);
 
         data = legacySave(data);
@@ -160,21 +162,34 @@ var Game = (function() {
             this.statistics.load(data);
             this.resources.load(data);
             this.buildings.load(data);
+            this.stargaze.load(data);
             this.tech.load(data);
-            
-            this.interstellar.load(data);
+            this.interstellar.load(data); 
             this.updates.load(data);
 
             legacyLoad(data);
 
             this.settings.load(data);
+
+            if(data != null && data.lastFixedUpdate && !isNaN(data.lastFixedUpdate)) {
+                this.handleOfflineGains((new Date().getTime() - data.lastFixedUpdate) / 1000);
+            }
         }
+
+        console.log("Load Successful");
+    };
+
+    instance.updateUI = function(self){
         Game.settings.updateCompanyName();
         refreshResources();
         refreshResearches();
         refreshTabs();
 
         updateCost();
+        updateDysonCost();
+        updateFuelProductionCost();
+        updateLabCost();
+        updateWonderCost();
 
         if(Game.constants.enableMachineTab === true){
             $('#machineTopTab').show();
@@ -182,12 +197,8 @@ var Game = (function() {
 
         $('#versionLabel').text(versionNumber);
 
-        if(data != null && data.lastFixedUpdate && !isNaN(data.lastFixedUpdate)) {
-            this.handleOfflineGains((new Date().getTime() - data.lastFixedUpdate) / 1000);
-        }
-
-        console.log("Load Successful");
-    };
+        self.interstellar.redundantChecking();
+    }
 
     instance.handleOfflineGains = function(offlineTime) {
         if(offlineTime <= 0) {
@@ -230,16 +241,19 @@ var Game = (function() {
         self.resources.initialise();
         self.buildings.initialise();
         self.tech.initialise();
-        self.interstellarBETA.initialise();
+        self.interstellar.initialise();
         self.stargaze.initialise();
 
         // Now load
         self.load();
+
         self.settings.initialise();
 
         for(var i = 0; i < self.uiComponents.length; i++) {
             self.uiComponents[i].initialise();
         }
+
+        self.updateUI(self);
 
         // Display what has changed since last time
         self.updates.initialise();
@@ -247,7 +261,7 @@ var Game = (function() {
         // Then start the main loops
         self.createInterval("Fast Update", self.fastUpdate, 100);
         self.createInterval("Slow Update", self.slowUpdate, 1000);
-        self.createInterval("UI Update", self.uiUpdate, 10);
+        self.createInterval("UI Update", self.uiUpdate, 100);
 
         // Do this in a setInterval so it gets called even when the window is inactive
         window.setInterval(function(){ Game.fixedUpdate(); },100);
@@ -257,7 +271,7 @@ var Game = (function() {
     };
 
     instance.loadAnimation = function(self, delta) {
-        if (self.logoAnimating === true) {
+        if (self.logoAnimating === false) {
             return;
         }
 
@@ -275,6 +289,9 @@ var Game = (function() {
     instance.noticeStack = {"dir1": "up", "dir2": "left", "firstpos1": 25, "firstpos2": 25};
 
     instance.notifyInfo = function(title, message) {
+        if(title == "Game Saved" && Game.settings.entries.saveNotifsEnabled == false){
+            return;
+        }
         if(Game.settings.entries.notificationsEnabled === true){
             this.activeNotifications.info = new PNotify({
                 title: title,
@@ -380,7 +397,7 @@ var Game = (function() {
         $('[data-toggle="tooltip"]').tooltip();
 
         console.debug("Loading Game");
-      
+        
         this.createInterval("Loading Animation", this.loadAnimation, 10);
         this.createInterval("Loading", this.loadDelay, 1000);
 
